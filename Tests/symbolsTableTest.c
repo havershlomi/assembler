@@ -14,7 +14,14 @@ int main(){
     }
     if(tryAddSymbol(&symbol2) == true){
         printf( "added : %s\n", symbol2.name);
-    }   
+    }
+
+    if(tryAddSymbol(&symbol2) == true){
+        printf( "added : %s\n", symbol2.name);
+    }
+
+    disposeSymbolsTable();
+
     if(tryAddSymbol(&symbol3) == true){
         printf( "added : %s\n", symbol3.name);
     }
@@ -23,6 +30,8 @@ int main(){
     }
 
     printf("%d\n",getSymbolRefrenceByName("shlomi"));
+
+    printf("%d\n",getSymbolRefrenceByName("david"));
 
     return 0;
 }

@@ -74,16 +74,17 @@ int getSymbolRefrenceByName(char* symbolName){
 }
 
 void disposeSymbolsTable(){
-    SymbolNode *symbolPtr, *nextPtr;
+    SymbolNode *symbolPtr, *currentPtr;
     
     if(symbolTable != NULL)
     {
         symbolPtr = symbolTable;
         while(symbolPtr != NULL)
         {
-            nextPtr = symbolPtr -> next;
-            free(symbolPtr);
-            symbolPtr = nextPtr;
+            currentPtr = symbolPtr;
+            symbolPtr =  symbolPtr -> next;
+            free(currentPtr);
         }
+        symbolTable = NULL;
     }
 }
