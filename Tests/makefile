@@ -1,3 +1,5 @@
+parserTest : parserTest.c
+	gcc -g -ansi -Wall  parserTest.c -o parserTest
 symbolsTableTest : symbolsTableTest.c symbolsTable.o utils.o
 	gcc -g -ansi -Wall -pedantic symbolsTableTest.c symbolsTable.o utils.o -o symbolsTableTest
 symbolsTable.o : ../symbolsTable.c 

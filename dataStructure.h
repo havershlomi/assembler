@@ -1,5 +1,5 @@
 typedef struct symbol {
-    char* name;
+    char name[30];
     int refrence;
 } Symbol;
 
