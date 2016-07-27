@@ -2,8 +2,6 @@
 #include "symbolsTable.h"
 #include "utils.h"
 
-
-
 int tryAddSymbol(Symbol* symbol)
 {
     SymbolNode *newNode = 0, *prevPtr, *symbolPtr;
@@ -17,7 +15,6 @@ int tryAddSymbol(Symbol* symbol)
             if(symbolPtr -> value.name != '\0' &&
                 strcmp(symbolPtr -> value.name, symbolName) == 0)
             {
-                
                 printErr("symbol: ");
                 printErr(symbolName);
                 printErr(" is already defined\n");

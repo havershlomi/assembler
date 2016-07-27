@@ -5,5 +5,5 @@
 #define LABAL_MAX_LENGTH 30
 
 enum {false,true};
-
+enum instructions{data,string,entry,externl,invalidInstruction};
 void printErr(const char* errMessage);
