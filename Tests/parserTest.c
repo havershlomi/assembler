@@ -7,9 +7,10 @@
 int main(int argc, char* argv[])
 {
     int lineCounter = 0;
+    /*int counter=0;*/
     int hasLabel = false;
     char label[30];
-    /* const char labelToken = ':';*/
+    char labelDelimeter;
 	char str[80];
 	FILE * inputP,*outputP = NULL;
 
@@ -40,13 +41,17 @@ int main(int argc, char* argv[])
         else
         {
             /*try to find label*/
-            if(sscanf(str,"%s:",label) == 1){
-                printf("checking label: %s\n",label);
+            if(sscanf(str,"%[^:]%[:]",label,&labelDelimeter) == 2){
                 if(!isspace(str[0]) && !isdigit(label[0]) && isalpha(label[0]) && strlen(label) <= LABAL_MAX_LENGTH){
-                    printf("found token: %s\n%d",label,hasLabel);
                     hasLabel = true;
+                } else {
+                    printErr("label \"");
+                    printErr(label);
+                    printErr("\" is invalid.\n");
                 }
             }
+            if(hasLabel == true){}
+ 
             /*check if instruction
             if(sscanf(str,"%[^\t\n\r\v\f.s]: ",label) == 1){
                 if(!isspace(label[0]) && !isdigit(label[0]) && isalpha(label[0])){
