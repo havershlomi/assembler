@@ -1,14 +1,7 @@
  dd: .data
-as: .data 
+as: .data 6, 8 ,0 
 s.extern
-	  .string "dsfds"
-
-dd:			.extern
-dd: .extern
-  .entr y  7,7,7,7
- shlomi
-mov ss
-	ma
- stop m
-Label: 			msto  s
-sto
+	    .string "dsfds"
+ 		      .string "dsfds dsf s sd"  ssd
+	.string "dsfds sad
+dd:	
