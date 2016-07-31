@@ -1,7 +1,9 @@
  dd: .data
-as: .data 6, 8 ,0 
+as: .data    		 6, 8 ,0 
+.data +4,   		-3  , 67
+.data + 4,   		-3  , 6 7
 s.extern
-	    .string "dsfds"
- 		      .string "dsfds dsf s sd"  ssd
-	.string "dsfds sad
+	    .string 	 "dsfds"
+ 		      .string "pisfds dsf s sd"  ssd
+	.string "erfds sad
 dd:	
