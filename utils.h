@@ -9,4 +9,5 @@
 enum {false,true};
 enum instructions{data,string,entry,externl,invalidInstruction};
 enum sentenceType{action,instruction};
+enum operandType{instant = 0, direct = 1, dynamic = 2, directRegister = 3, invalidOperand = -1};
 void printErr(const char* errMessage);

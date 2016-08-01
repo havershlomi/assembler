@@ -18,11 +18,11 @@ int getInstructionType(const char* instruction){
 }
 
 void parse(FILE* input){
-    int instructionType = -1, dataPosition = -1;
+    int instructionType = -1;
     int hasLabel = false;
-    char label[30], dataType[80],action[4];
+    char label[30], dataType[80],action[4],actionAttr[80];
     char labelDelimeter;
-	char str[80], instructionData[80], dataStr[80],stringEnd[1];
+	char str[80], dataStr[80], *operands, delimiter[1]=",";
 
     Action *selectedAction;
 
@@ -53,43 +53,62 @@ void parse(FILE* input){
                     printErr("invalid instruction was found\n");
                 }
                 else if(instructionType == string){
-                    /*get the string only if valid and put it in the data collection*/
-                    if(sscanf(dataStr,"\"%[^\"] %[\"]",instructionData,stringEnd) == 2)
-                    {
-                        /*printf("this is my data:'%s'\n",instructionData);*/
-                        dataPosition  = addStringData(instructionData);
-                        if(hasLabel == true){
-                            /*add to symbol label*/
-                            printf("%d",dataPosition);
-                        }  
-                    }else{
-                        printf("invalid string\n");
-                    }
-                    /*get the numbers or string and add it to the data collection*/
+                    parseStringInstruction(dataStr,hasLabel);
                 }
                 else if(instructionType == data){
                     parseDataInstruction(dataStr,hasLabel);
+                } else {
+                    /*add extern and entry handlers*/
                 }
                  
-            } else if((hasLabel == true && sscanf(str,"%*s %s",action) == 1)
-                || sscanf(str," %s",action) == 1){
+            } else if((hasLabel == true && sscanf(str,"%*s %[^ \t\r] %[*] ",action, actionAttr) == 2)
+                || sscanf(str," %s %s ",action,actionAttr) == 2){
                 /*handle action*/
-                
                 selectedAction = getActionByName(action);
-                if(selectedAction == NULL){
-                    printErr("the action name is invalid\n");
-                    /*check action
-                    cut the rest of the string and then pass it to the action handler */
+                printf("%s| %s\n",action,actionAttr);
+                if(selectedAction != NULL){
+                    printf("Action: %s \n",selectedAction -> name);
+                    if(selectedAction -> numOfOperands == 2){
+                        operands = strtok(actionAttr,delimiter);
+                        printf("%s",operands);
 
+                    } else if(selectedAction -> numOfOperands == 1){
+                        printf("%d\n",getOperandType(actionAttr));
+                    }
+                    else {
+
+                    }
+                    /*
+                    check action
+                    cut the rest of the string and then pass it to the action handler
+                    */
                 }
                 else
-                    printf("Action: %s \n",selectedAction -> name);
+                    printErr("the action name is invalid\n");
             }
         }
 	}
-   
 }
 
+/*gets the  string instruction and extract all the numbers and save them*/
+void parseStringInstruction(char *dataStr, const int hasLabel){
+    char stringEnd[1], instructionData[80];
+    int dataPosition = -1;
+    /*get the string only if valid and put it in the data collection*/
+    if(sscanf(dataStr,"\"%[^\"] %[\"]",instructionData,stringEnd) == 2)
+    {
+        /*printf("this is my data:'%s'\n",instructionData);*/
+        dataPosition  = addStringData(instructionData);
+        if(hasLabel == true){
+            /*add to symbol label*/
+            printf("%d",dataPosition);
+        }  
+    }else{
+        printf("invalid string\n");
+    }
+}
+
+/*gets the data instruction and extract all the numbers and save them*/
 void parseDataInstruction(char *dataStr, const int hasLabel){
     char *numberPart,numberDelimiter[1] = ",";
     int numbers[80] , numberFactor = 1;

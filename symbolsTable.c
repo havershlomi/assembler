@@ -20,6 +20,7 @@ int tryAddSymbol(Symbol* symbol)
                 printErr(" is already defined\n");
                 return false;               
             }
+            /*check that the symbol name is not used name (EX: r0, mov)*/
             prevPtr = symbolPtr; 
             symbolPtr = symbolPtr -> next;
         }
