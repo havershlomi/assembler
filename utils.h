@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 #define LABAL_MAX_LENGTH 30
+#define KNRM  "\x1B[34m"
 
 enum {false,true};
 enum instructions{data,string,entry,externl,invalidInstruction};

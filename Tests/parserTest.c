@@ -11,12 +11,10 @@ int main(int argc, char* argv[])
 {
     /*int counter=0;*/
  	FILE * inputP,*outputP = NULL;
-     char *del = "mov",par[80] =" ds mov wowowowoow"; 
-char *c = strtok(par,del);
-c = strtok(NULL,del);
+     
 
-
-        printf("%s\n",c);
+if(isdigit(' '))
+        printf("isDDigit");
     /*load the files if needed*/
     if(argc > 1){
         if((inputP = fopen(argv[1],"r")) == NULL){

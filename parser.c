@@ -18,11 +18,12 @@ int getInstructionType(const char* instruction){
 }
 
 void parse(FILE* input){
-    int instructionType=-1;
+    int instructionType = -1, dataPosition = -1;
     int hasLabel = false;
     char label[30], dataType[80],action[4];
     char labelDelimeter;
-	char str[80],data;
+	char str[80], instructionData[80], dataStr[80],stringEnd[1];
+
     Action *selectedAction;
 
      while(fgets(str,80,input) != NULL){
@@ -44,23 +45,32 @@ void parse(FILE* input){
             }
  
             /*check if instruction*/
-            if((hasLabel == true && sscanf(str,"%*s %*[.]%s",dataType) == 1)
-                || sscanf(str," %*[.]%s",dataType) == 1){
-                printf("found token: %s\n",dataType);
+            if((hasLabel == true && sscanf(str,"%*s %*[.]%s %[^\n]",dataType,dataStr) == 2)
+                || sscanf(str," %*[.]%s %[^\n]",dataType,dataStr) == 2){
+                printf("found token: %s data:'%s'\n",dataType,dataStr);
                 instructionType = getInstructionType(dataType);
                 if(instructionType == invalidInstruction){
                     printErr("invalid instruction was found\n");
                 }
                 else if(instructionType == string){
-                    if(sscanf(str,"%*s \"%s%*[\"]",&data) == 1)
+                    /*get the string only if valid and put it in the data collection*/
+                    if(sscanf(dataStr,"\"%[^\"] %[\"]",instructionData,stringEnd) == 2)
                     {
-                        printf("this is my data:'%s'\n",&data);
-                        printf("%d",addData(&data));  
+                        /*printf("this is my data:'%s'\n",instructionData);*/
+                        dataPosition  = addStringData(instructionData);
+                        if(hasLabel == true){
+                            /*add to symbol label*/
+                            printf("%d",dataPosition);
+                        }  
                     }else{
-                        printf("couldn't find\n");
+                        printf("invalid string\n");
                     }
                     /*get the numbers or string and add it to the data collection*/
                 }
+                else if(instructionType == data){
+                    parseDataInstruction(dataStr,hasLabel);
+                }
+                 
             } else if((hasLabel == true && sscanf(str,"%*s %s",action) == 1)
                 || sscanf(str," %s",action) == 1){
                 /*handle action*/
@@ -78,4 +88,53 @@ void parse(FILE* input){
         }
 	}
    
+}
+
+void parseDataInstruction(char *dataStr, const int hasLabel){
+    char *numberPart,numberDelimiter[1] = ",";
+    int numbers[80] , numberFactor = 1;
+    int j = 0, i = 0, dataPosition = -1;
+    int  startReadingNumber = false, finishReadingNumber = false, invalidData = false;
+    numberPart = strtok(dataStr,numberDelimiter);
+    j = 0;
+    while(numberPart != NULL && invalidData == false){
+        startReadingNumber = false;
+        finishReadingNumber = false;
+        numbers[j] = 0;
+        numberFactor = 1;
+        /*iterate over number string*/
+        for(i = 0;i < strlen(numberPart); i++){
+            if(isdigit(numberPart[i]) && finishReadingNumber == false){
+                startReadingNumber = true;                                
+                numbers[j] = numbers[j] * 10 + (numberPart[i]-'0');
+            } else if(startReadingNumber == true && isspace(numberPart[i])) {
+                finishReadingNumber = true;
+            } else if(finishReadingNumber == true){
+                invalidData = true;
+                break;
+            }
+            else if(numberPart[i] == '+' || numberPart[i] == '-') {
+                startReadingNumber = true;
+                if(numberPart[i] == '-')
+                    numberFactor = -1; 
+            }
+        }
+        if(startReadingNumber == false){
+            invalidData = true;
+        } else {
+            numbers[j] *= numberFactor;
+            j++;     
+        }
+        numberPart = strtok(NULL,numberDelimiter);
+    }
+    if(invalidData == true){
+        printErr("invalid data\n");
+        invalidData = false;
+    } else {                        
+        dataPosition = addNumbersData(numbers,j);
+        if(hasLabel == true){
+            /*add to symbol label*/
+            printf("%d",dataPosition);
+        }
+    }
 }

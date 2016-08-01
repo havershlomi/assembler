@@ -1,4 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-int addData(char* data);
+int addStringData(char* data);
+int addNumbersData(int* data, int arrayLength);
+void clearData();
