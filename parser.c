@@ -61,8 +61,8 @@ void parse(FILE* input){
                     /*add extern and entry handlers*/
                 }
                  
-            } else if((hasLabel == true && sscanf(str,"%*s %[^ \t\r] %[*] ",action, actionAttr) == 2)
-                || sscanf(str," %s %s ",action,actionAttr) == 2){
+            } else if((hasLabel == true && sscanf(str,"%*s %s %[^\n] ",action, actionAttr) == 2)
+                || sscanf(str," %s %[^\n] ",action,actionAttr) == 2){
                 /*handle action*/
                 selectedAction = getActionByName(action);
                 printf("%s| %s\n",action,actionAttr);

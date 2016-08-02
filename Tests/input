@@ -1,16 +1,16 @@
 as: .data    		 6, 8 ,503 , 
 .data +4,   		-3  , 67,909,99, 7   ,4,
-mov r1, r2
-	    
+mov r1, 	r2
+		
 		bne line
 		jmp #5
-		jmp #-5
-		jmp #+5
+		jmp #-5     			
+		jmp #+5  hbh
 		
 		jsr x[2]
 		jsr x[
-		jsr x[,2]
+shlo:		jsr x[,2]
 		
-		jsr x[2,3]
-		jsr x[2,3] dsda
-		red 	r1
+	 	 jsr x[2,3]       							
+		jsr x[2,3] 		dsda		
+		red 	r1 vgfcfrcgf f 
