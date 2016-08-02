@@ -1,5 +1,6 @@
 int getActionBLAddress(char *action,char *actionAttr, const int hasLabel);
-void parseDataInstruction(char *dataStr, const int hasLabel);
-void parseStringInstruction(char *dataStr, const int hasLabel);
+int addStringInstructionToDC(char *dataStr);
+int addDataInstructionToDC(char *dataStr);
 int getInstructionType(const char* instruction);
-void parse(FILE* input);
+int isValidLabel(char *label);
+void firstMove(FILE* input);

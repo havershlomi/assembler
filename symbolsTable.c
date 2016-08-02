@@ -86,3 +86,19 @@ void disposeSymbolsTable(){
         symbolTable = NULL;
     }
 }
+
+void printTable(){
+    SymbolNode *symbolPtr;
+    
+    if(symbolTable != NULL)
+    {
+        /*check if symbol is not in the table already*/
+        symbolPtr = symbolTable;
+        while(symbolPtr != NULL)
+        {
+            printf("%s|%d|%d|%d\n",symbolPtr -> value.name,symbolPtr -> value.refrence,symbolPtr -> value.isExternal,
+            symbolPtr -> value.commandType);
+            symbolPtr = symbolPtr -> next;
+        }
+    }
+}

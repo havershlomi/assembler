@@ -2,7 +2,15 @@
 #include "parser.h"
 #include "codeCollection.h"
 #include "dataCollection.h"
+#include "symbolsTable.h"
 
+
+char *illegalLabelNames[24]={
+    "r0","r1","r2","r3","r4","r5","r6","r7",
+    "mov","cmp","add","sub","not","clr","lea","inc","dec","jmp","bne","red","prn","jsr","rts","stop"
+};
+
+const long ILLIEGAL_LABELS_LENGTH = (sizeof(illegalLabelNames)/(sizeof(char*)));
 
 int getInstructionType(const char* instruction){
     if(strcmp(instruction,"data") == 0)
@@ -17,58 +25,110 @@ int getInstructionType(const char* instruction){
         return invalidInstruction;
 }
 
-void parse(FILE* input){
-    int instructionType = -1;
+void firstMove(FILE* input){
+    int instructionType = -1, dcPointer = -1, isExternal = false, commandType = none, icPointer = -1;
     int hasLabel = false;
-    char label[30], dataType[LINE_LENGTH],action[4],actionAttr[LINE_LENGTH];
+    char label[30] = "", dataType[LINE_LENGTH] = "", action[4] = "",actionAttr[LINE_LENGTH] = "",*labelPtr;
     char labelDelimeter;
-	char str[LINE_LENGTH], dataStr[LINE_LENGTH];
+	char str[LINE_LENGTH] = "", dataStr[LINE_LENGTH] = "";
+    Symbol *symbol;
 
-
-     while(fgets(str,LINE_LENGTH,input) != NULL){
+    while(fgets(str,LINE_LENGTH,input) != NULL){
         printf("new sentence:  %s\n",str);
         hasLabel = false;
         
         if(str[0] != ';')
         {
             /*try to find label*/
-            if(sscanf(str,"%[^:]%[:]",label,&labelDelimeter) == 2){
-                if(!isspace(str[0]) && !isdigit(label[0]) && isalpha(label[0]) && strlen(label) <= LABAL_MAX_LENGTH){
-                    hasLabel = true;
-                
+            if(sscanf(str,"%[^ \r\t:]%[:]",label,&labelDelimeter) == 2){
+                if(!isspace(str[0])  && isValidLabel(label) == true){
+                    hasLabel = true; 
+                    labelPtr = label;
+                    printf("symbolFound:%s\n",label);
                 } else {
                     printErr("label \"");
                     printErr(label);
                     printErr("\" is invalid.\n");
                 }
             }
- 
             /*check if instruction*/
-            if((hasLabel == true && sscanf(str,"%*s %*[.]%s %[^\n]",dataType,dataStr) == 2)
-                || sscanf(str," %*[.]%s %[^\n]",dataType,dataStr) == 2){
-                printf("found token: %s data:'%s'\n",dataType,dataStr);
+            if((hasLabel == true && sscanf(str,"%*[^ \r\t:]%*[:] %*[.]%s %[^\n]",dataType,dataStr) == 2)
+                || (hasLabel == false && sscanf(str," %*[.]%s %[^\n]",dataType,dataStr) == 2)){
+                
                 instructionType = getInstructionType(dataType);
                 if(instructionType == invalidInstruction){
                     printErr("invalid instruction was found\n");
                 }
                 else if(instructionType == string){
-                    parseStringInstruction(dataStr,hasLabel);
+                    dcPointer =  addStringInstructionToDC(dataStr);
+                    isExternal = false;
+                    commandType = instructionCommand;
                 }
                 else if(instructionType == data){
-                    parseDataInstruction(dataStr,hasLabel);
-                } else {
-                    /*add extern and entry handlers*/
+                    dcPointer = addDataInstructionToDC(dataStr);
+                    isExternal = false;
+                    commandType = instructionCommand;
+                } 
+                else if(instructionType == externl){
+                    if(isValidLabel(dataStr) == true){
+                        isExternal = true;
+                        dcPointer = 0;
+                        commandType = none;
+                        labelPtr = dataStr;
+                    } else {
+                        printErr("illegal symbol for .extern instruction \n");
+                    }
+                } 
+                if((hasLabel == true && (instructionType == data || instructionType == string))
+                    || (instructionType == externl && isExternal == true)){
+                    symbol = (Symbol*)malloc(sizeof(Symbol));
+                    memcpy(symbol -> name,labelPtr,30);/*copy string into name and extrac into to a function*/
+                    symbol -> isExternal = isExternal;
+                    symbol -> refrence = dcPointer;
+                    symbol -> commandType = commandType;
+
+                    if(tryAddSymbol(symbol) == true){
+                        printf( "added : %s\n", symbol -> name);
+                    }
                 }
-                 
-            } else if((hasLabel == true && sscanf(str,"%*s %s %[^\n] ",action, actionAttr) == 2)
-                || sscanf(str," %s %[^\n] ",action,actionAttr) == 2){
+            } else if((hasLabel == true && sscanf(str,"%*[^ \r\t:]%*[:] %[^ \r\t:] %[^\n] ",action, actionAttr) == 2)
+                || (hasLabel == false && sscanf(str," %s %[^\n] ",action,actionAttr) == 2)){
                 /*handle action*/
-                getActionBLAddress(action,actionAttr,hasLabel);
-            } else {
-                printErr(" invalid command\n");
+                icPointer  = getActionBLAddress(action,actionAttr,hasLabel);
+                    printf("%s\n",label);
+                
+                if(hasLabel == true && icPointer != INVALID){
+                    symbol = (Symbol*)malloc(sizeof(Symbol));
+                    memcpy(symbol -> name,label,30);
+                    symbol -> isExternal = false;
+                    symbol -> refrence = icPointer;
+                    symbol -> commandType = actionCommand;
+
+                    if(tryAddSymbol(symbol) == true){
+                        printf( "added : %s\n", symbol -> name);
+                    }
+                }
+            } else if(sscanf(str," %[^ \t\r\n] ",dataStr) == 1){
+                /*if not empty line */
+                printErr("Invalid command \n");
             }
         }
 	}
+}
+
+int isValidLabel(char *label){
+    char validLabel[LINE_LENGTH] = "" ,extraData[LINE_LENGTH] = "";
+    int i = 0;
+    if(sscanf(label," %[^ \t\r] %s ",validLabel,extraData) == 1 &&
+        !isdigit(label[0]) && isalpha(label[0]) && strlen(label) <= LABAL_MAX_LENGTH){
+        for(i = 0; i < 24; i++){
+            if(strcmp(label,illegalLabelNames[i]) == 0){
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 int getActionBLAddress(char *action,char *actionAttr, const int hasLabel){
@@ -81,7 +141,7 @@ int getActionBLAddress(char *action,char *actionAttr, const int hasLabel){
     if(selectedAction != NULL){
         printf("Action: %s \n",selectedAction -> name);
         if(selectedAction -> numOfOperands == 2){
-            if(sscanf(actionAttr," %[^ \r\t,] , %[^ \r\t] %[^\n] ",firstOper,secondOper,extraData) >= 2){
+            if(sscanf(actionAttr," %[^ \r\t:,] , %[^ \r\t:] %[^\n] ",firstOper,secondOper,extraData) >= 2){
                 printf("%s \n %s \n %s\n",firstOper,secondOper,extraData);
                 if(strlen(extraData) != 0){
                     printErr(action);
@@ -90,11 +150,13 @@ int getActionBLAddress(char *action,char *actionAttr, const int hasLabel){
                     blockAddressSourceType = getOperandType(firstOper);
                     blockAddressDestType = getOperandType(secondOper);
 
-                    if(isValidBlockAddressTypeForAction(blockAddressSourceType,selectedAction -> sourceOper) == false
-                        || isValidBlockAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == false){
-                        printErr("invalid block address method for action\n");                
-                    } else {
+                    if(isValidBlockAddressTypeForAction(blockAddressSourceType,selectedAction -> sourceOper) == true
+                        && isValidBlockAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == true){
                         return getActionRefrenceinMemory(blockAddressSourceType, blockAddressDestType); 
+                    } else {
+                        printErr("invalid block address method for action '");
+                        printErr(action);
+                        printErr("'\n");                
                     }    
                 }
             } else {
@@ -104,7 +166,9 @@ int getActionBLAddress(char *action,char *actionAttr, const int hasLabel){
         } else if(selectedAction -> numOfOperands == 1){
             blockAddressDestType = getOperandType(actionAttr);
             if(isValidBlockAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == false){
-                printErr("invalid block address method for action\n");
+                printErr("invalid block address method for action '");
+                printErr(action);
+                printErr("'\n");
             } else {
                 return getActionRefrenceinMemory(notUsedOper, blockAddressDestType);
             }   
@@ -117,37 +181,28 @@ int getActionBLAddress(char *action,char *actionAttr, const int hasLabel){
             } else
                 return getActionRefrenceinMemory(notUsedOper, notUsedOper);
         }
-        /*
-        check action
-        cut the rest of the string and then pass it to the action handler
-        */
     }
     else {
         printErr("the action name is invalid\n");
     }
-    return INVALID_ACTION;
+    return INVALID;
 }
 
 /*gets the  string instruction and extract all the numbers and save them*/
-void parseStringInstruction(char *dataStr, const int hasLabel){
-    char stringEnd[1], instructionData[LINE_LENGTH];
-    int dataPosition = -1;
+int addStringInstructionToDC(char *dataStr){
+    char stringEnd[1], instructionData[LINE_LENGTH] = "";
     /*get the string only if valid and put it in the data collection*/
     if(sscanf(dataStr,"\"%[^\"] %[\"]",instructionData,stringEnd) == 2)
     {
-        /*printf("this is my data:'%s'\n",instructionData);*/
-        dataPosition  = addStringData(instructionData);
-        if(hasLabel == true){
-            /*add to symbol label*/
-            printf("%d",dataPosition);
-        }  
+        return addStringData(instructionData);  
     }else{
         printf("invalid string\n");
+        return INVALID;
     }
 }
 
 /*gets the data instruction and extract all the numbers and save them*/
-void parseDataInstruction(char *dataStr, const int hasLabel){
+int addDataInstructionToDC(char *dataStr){
     char *numberPart,numberDelimiter[1] = ",";
     int numbers[LINE_LENGTH] , numberFactor = 1;
     int j = 0, i = 0, dataPosition = -1;
@@ -189,9 +244,6 @@ void parseDataInstruction(char *dataStr, const int hasLabel){
         invalidData = false;
     } else {                        
         dataPosition = addNumbersData(numbers,j);
-        if(hasLabel == true){
-            /*add to symbol label*/
-            printf("%d",dataPosition);
-        }
     }
+    return dataPosition;
 }

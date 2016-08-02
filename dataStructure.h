@@ -1,7 +1,7 @@
 typedef struct symbol {
-    char name[30];
+    char *name;
     int refrence;
-    int type;
+    int commandType;
     int isExternal;
 } Symbol;
 

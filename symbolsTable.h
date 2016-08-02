@@ -8,3 +8,5 @@ int tryAddSymbol(Symbol* symbol);
 int getSymbolRefrenceByName(char* symbolName);
 /*clear all the allocations the table made and reset table*/
 void disposeSymbolsTable();
+
+void printTable();

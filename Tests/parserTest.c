@@ -4,6 +4,7 @@
 #include "../utils.h"
 #include "../parser.h"
 #include "../codeCollection.h"
+#include "../symbolsTable.h"
 
 
  
@@ -33,8 +34,8 @@ if(isdigit(' '))
         stdout = outputP;
     }
     getActionByName("stop");
-   parse(inputP);
-
+   firstMove(inputP);
+   printTable();
 	if(inputP != NULL)
 		fclose(inputP);
 	if(outputP != NULL)

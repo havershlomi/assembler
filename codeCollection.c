@@ -1,6 +1,7 @@
 #include "codeCollection.h"
-#include "sharedCollections.h"
 #include "utils.h"
+
+extern Action ValidActions[];
 
 int ic = 100;
 
@@ -16,9 +17,8 @@ Action* getActionByName(const char* name){
 
 int getOperandType(const char* oper){
     int number = -1, number2 = -1;
-    char operAttr[LINE_LENGTH]  ="", extraData[LINE_LENGTH] ="";
+    char operAttr[LINE_LENGTH]  = "", extraData[LINE_LENGTH] = "";
     
-/*printf("%d",sscanf(oper," %*[^[][%d,%d] ",&number,&number2));*/
     if(sscanf(oper," %*[#]%*[-+]%d %[^\n]",&number,extraData) >= 1 ||
         sscanf(oper," %*[#]%d %[^\n]",&number,extraData) >= 1){
             if(strlen(extraData) == 0)
@@ -49,8 +49,9 @@ int isValidBlockAddressTypeForAction(int sourcingType, int* validBLA){
     for(i = 0; i < arrayMaxLength; i++){
         if(validBLA[i] == -1)
             return false;
-        if(validBLA[i] == sourcingType)
+        if(validBLA[i] == sourcingType){
             return true;
+        }
     }
     return false;
 }
