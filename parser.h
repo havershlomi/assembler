@@ -1,4 +1,4 @@
-
+int getActionBLAddress(char *action,char *actionAttr, const int hasLabel);
 void parseDataInstruction(char *dataStr, const int hasLabel);
 void parseStringInstruction(char *dataStr, const int hasLabel);
 int getInstructionType(const char* instruction);

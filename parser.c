@@ -20,13 +20,12 @@ int getInstructionType(const char* instruction){
 void parse(FILE* input){
     int instructionType = -1;
     int hasLabel = false;
-    char label[30], dataType[80],action[4],actionAttr[80];
+    char label[30], dataType[LINE_LENGTH],action[4],actionAttr[LINE_LENGTH];
     char labelDelimeter;
-	char str[80], dataStr[80], *operands, delimiter[1]=",";
+	char str[LINE_LENGTH], dataStr[LINE_LENGTH];
 
-    Action *selectedAction;
 
-     while(fgets(str,80,input) != NULL){
+     while(fgets(str,LINE_LENGTH,input) != NULL){
         printf("new sentence:  %s\n",str);
         hasLabel = false;
         
@@ -64,35 +63,74 @@ void parse(FILE* input){
             } else if((hasLabel == true && sscanf(str,"%*s %s %[^\n] ",action, actionAttr) == 2)
                 || sscanf(str," %s %[^\n] ",action,actionAttr) == 2){
                 /*handle action*/
-                selectedAction = getActionByName(action);
-                printf("%s| %s\n",action,actionAttr);
-                if(selectedAction != NULL){
-                    printf("Action: %s \n",selectedAction -> name);
-                    if(selectedAction -> numOfOperands == 2){
-                        operands = strtok(actionAttr,delimiter);
-                        printf("%s",operands);
-
-                    } else if(selectedAction -> numOfOperands == 1){
-                        printf("%d\n",getOperandType(actionAttr));
-                    }
-                    else {
-
-                    }
-                    /*
-                    check action
-                    cut the rest of the string and then pass it to the action handler
-                    */
-                }
-                else
-                    printErr("the action name is invalid\n");
+                getActionBLAddress(action,actionAttr,hasLabel);
+            } else {
+                printErr(" invalid command\n");
             }
         }
 	}
 }
 
+int getActionBLAddress(char *action,char *actionAttr, const int hasLabel){
+    Action *selectedAction;
+    char firstOper[LINE_LENGTH] = "", secondOper[LINE_LENGTH] = "", extraData[LINE_LENGTH] = "";
+    int blockAddressSourceType = -1, blockAddressDestType = -1;
+
+    selectedAction = getActionByName(action);
+    printf("%s| %s\n",action,actionAttr);
+    if(selectedAction != NULL){
+        printf("Action: %s \n",selectedAction -> name);
+        if(selectedAction -> numOfOperands == 2){
+            if(sscanf(actionAttr," %[^ \r\t,] , %[^ \r\t] %[^\n] ",firstOper,secondOper,extraData) >= 2){
+                printf("%s \n %s \n %s\n",firstOper,secondOper,extraData);
+                if(strlen(extraData) != 0){
+                    printErr(action);
+                    printErr(" can not get more than 2 operands\n");
+                } else {
+                    blockAddressSourceType = getOperandType(firstOper);
+                    blockAddressDestType = getOperandType(secondOper);
+
+                    if(isValidBlockAddressTypeForAction(blockAddressSourceType,selectedAction -> sourceOper) == false
+                        || isValidBlockAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == false){
+                        printErr("invalid block address method for action\n");                
+                    } else {
+                        return getActionRefrenceinMemory(blockAddressSourceType, blockAddressDestType); 
+                    }    
+                }
+            } else {
+                printErr(action);
+                printErr(" except to get 2 operands\n");                
+            }
+        } else if(selectedAction -> numOfOperands == 1){
+            blockAddressDestType = getOperandType(actionAttr);
+            if(isValidBlockAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == false){
+                printErr("invalid block address method for action\n");
+            } else {
+                return getActionRefrenceinMemory(notUsedOper, blockAddressDestType);
+            }   
+        }
+        else {
+            /*handle actions that have zero operands*/
+            if(sscanf(actionAttr," %[^\n] ",extraData) == 1){
+                printErr(action);
+                printErr(" can not accept operands\n");               
+            } else
+                return getActionRefrenceinMemory(notUsedOper, notUsedOper);
+        }
+        /*
+        check action
+        cut the rest of the string and then pass it to the action handler
+        */
+    }
+    else {
+        printErr("the action name is invalid\n");
+    }
+    return INVALID_ACTION;
+}
+
 /*gets the  string instruction and extract all the numbers and save them*/
 void parseStringInstruction(char *dataStr, const int hasLabel){
-    char stringEnd[1], instructionData[80];
+    char stringEnd[1], instructionData[LINE_LENGTH];
     int dataPosition = -1;
     /*get the string only if valid and put it in the data collection*/
     if(sscanf(dataStr,"\"%[^\"] %[\"]",instructionData,stringEnd) == 2)
@@ -111,7 +149,7 @@ void parseStringInstruction(char *dataStr, const int hasLabel){
 /*gets the data instruction and extract all the numbers and save them*/
 void parseDataInstruction(char *dataStr, const int hasLabel){
     char *numberPart,numberDelimiter[1] = ",";
-    int numbers[80] , numberFactor = 1;
+    int numbers[LINE_LENGTH] , numberFactor = 1;
     int j = 0, i = 0, dataPosition = -1;
     int  startReadingNumber = false, finishReadingNumber = false, invalidData = false;
     numberPart = strtok(dataStr,numberDelimiter);

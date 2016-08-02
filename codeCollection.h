@@ -7,3 +7,7 @@ Action* getActionByName(const char* name);
 int addAction();
 
 int getOperandType(const char* oper);
+
+int isValidBlockAddressTypeForAction(int sourcingType, int* validBLA);
+
+int getActionRefrenceinMemory(int blaSrc, int blaDest);

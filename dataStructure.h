@@ -16,7 +16,7 @@ typedef struct action {
     char *name;
 	int binaryIndex;
     int sourceOper[4];
-    int destinationOper[4];
+    int destOper[4];
     unsigned int numOfOperands;
 } Action;
 

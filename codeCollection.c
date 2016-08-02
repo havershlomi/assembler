@@ -16,7 +16,7 @@ Action* getActionByName(const char* name){
 
 int getOperandType(const char* oper){
     int number = -1, number2 = -1;
-    char operAttr[80]  ="", extraData[80] ="";
+    char operAttr[LINE_LENGTH]  ="", extraData[LINE_LENGTH] ="";
     
 /*printf("%d",sscanf(oper," %*[^[][%d,%d] ",&number,&number2));*/
     if(sscanf(oper," %*[#]%*[-+]%d %[^\n]",&number,extraData) >= 1 ||
@@ -42,4 +42,31 @@ int getOperandType(const char* oper){
     } else {
         return invalidOperand;        
     }
+}
+
+int isValidBlockAddressTypeForAction(int sourcingType, int* validBLA){
+    int i = 0, arrayMaxLength = 4; 
+    for(i = 0; i < arrayMaxLength; i++){
+        if(validBLA[i] == -1)
+            return false;
+        if(validBLA[i] == sourcingType)
+            return true;
+    }
+    return false;
+}
+
+int getActionRefrenceinMemory(int blaSrc, int blaDest){
+    int numberOfRows = 1;
+    if(blaDest == directRegister && blaSrc == directRegister){
+        numberOfRows += 1;
+    } else if(blaSrc != notUsedOper && blaDest != notUsedOper){
+        numberOfRows += 2;
+    } 
+    else if((blaSrc == notUsedOper && blaDest != notUsedOper) ||
+            (blaDest == notUsedOper && blaSrc != notUsedOper)){
+        numberOfRows += 1;
+    }
+    ic += numberOfRows;
+
+    return ic;
 }
