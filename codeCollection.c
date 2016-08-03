@@ -28,9 +28,9 @@ int getOperandType(const char* oper){
         if(number >= 0 && number <= 7 && strlen(extraData) == 0)
             return directRegister;
         return invalidOperand;
-    } else if(sscanf(oper," %*[^[][%d,%d] %[^\n]",&number,&number2,extraData) >= 2 ||
-            sscanf(oper," %*[^[][%d,] %[^\n]",&number,extraData) >= 1 ||
-            sscanf(oper," %*[^[][,%d] %[^\n]",&number,extraData) >= 1){
+    } else if(sscanf(oper," %*[^[][%d-%d] %[^\n]",&number,&number2,extraData) >= 2 ||
+            sscanf(oper," %*[^[][%d-] %[^\n]",&number,extraData) >= 1 ||
+            sscanf(oper," %*[^[][-%d] %[^\n]",&number,extraData) >= 1){
         if(strlen(extraData) == 0 && number < number2 && number >= 0 && number2 <= 13)
             return dynamic;
         return invalidOperand;
@@ -74,4 +74,8 @@ int getActionRefrenceinMemory(int blaSrc, int blaDest){
 
 int getICPointer(){
     return ic;
+}
+
+void resetIc(){
+    ic = IC_START_POSITION;
 }

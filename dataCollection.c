@@ -12,6 +12,7 @@ int addStringData(char* data)
     }
     dataCollection[dc] = '\0';
     dc++;
+    printf("%s, dc: %d",data,currentDc);
     return currentDc;
 }
 
