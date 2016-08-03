@@ -6,6 +6,8 @@ dmov: dds d s
 shlomi: mov r4, r4
 .extern data
 .extern L
+
+goodData: .data 2,3,4,5
 why: jsr r2
 why: stop 
 

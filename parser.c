@@ -91,7 +91,7 @@ void firstMove(FILE* input){
                 || (hasLabel == false && sscanf(str," %s %[^\n] ",action,actionAttr) >= 1)){
                 /*handle action*/
                 icPointer  = getActionBLAddress(action,actionAttr);
-                printf("%s\n",label);
+                printf("%s|%d\n",label,icPointer);
                 
                 if(hasLabel == true && icPointer != INVALID){
                     symbol = createSymbol(label, icPointer, actionCommand, isExternal);

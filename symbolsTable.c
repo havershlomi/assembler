@@ -106,8 +106,26 @@ void disposeSymbolsTable(){
     }
 }
 
-void updateDataSymbolsRefrence(int icPointer){
-
+void updateSymbolTableRefrences(int icPointer){
+     SymbolNode *symbolNodePtr;
+     Symbol currentSymbol;
+    
+    if(symbolTable != NULL)
+    {
+        /*check if symbol is not in the table already*/
+        symbolNodePtr = symbolTable;
+        while(symbolNodePtr != NULL)
+        {
+            currentSymbol = (symbolNodePtr -> value);
+            
+            if(currentSymbol.isExternal == false && currentSymbol.commandType == instructionCommand){
+                printf("%s,%d",currentSymbol.name,icPointer);
+                symbolNodePtr -> value.refrence = currentSymbol.refrence + icPointer;
+                
+            }
+            symbolNodePtr = symbolNodePtr -> next;
+        }
+    }
 }
 
 void printTable(){

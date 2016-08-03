@@ -3,7 +3,7 @@
 
 extern Action ValidActions[];
 
-static int ic = 100;
+static int ic = IC_START_POSITION;
 
 Action* getActionByName(const char* name){
     int i = 0;
@@ -57,7 +57,7 @@ int isValidBlockAddressTypeForAction(int sourcingType, int* validBLA){
 }
 
 int getActionRefrenceinMemory(int blaSrc, int blaDest){
-    int numberOfRows = 1;
+    int numberOfRows = 1, currentIc = ic;
     if(blaDest == directRegister && blaSrc == directRegister){
         numberOfRows += 1;
     } else if(blaSrc != notUsedOper && blaDest != notUsedOper){
@@ -69,7 +69,7 @@ int getActionRefrenceinMemory(int blaSrc, int blaDest){
     }
     ic += numberOfRows;
 
-    return ic;
+    return currentIc;
 }
 
 int getICPointer(){

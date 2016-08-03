@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 {
     /*int counter=0;*/
  	FILE * inputP,*outputP = NULL;
-     
+     int icPointer = -1;
 
 if(isdigit(' '))
         printf("isDDigit");
@@ -35,8 +35,10 @@ if(isdigit(' '))
     }
     getActionByName("stop");
     firstMove(inputP);
+    icPointer = getICPointer();
     printTable();
-    disposeSymbolsTable();
+    updateSymbolTableRefrences(icPointer);
+    printf("\nUpdated Table\n\n");
     printTable();
 	if(inputP != NULL)
 		fclose(inputP);

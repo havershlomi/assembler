@@ -9,6 +9,6 @@ int getSymbolRefrenceByName(char* symbolName);
 /*clear all the allocations the table made and reset table*/
 void disposeSymbolsTable();
 Symbol* createSymbol(char *label, int refrence, int commandType, int isExternal);
-void updateDataSymbolsRefrence(int icPointer);
+void updateSymbolTableRefrences(int icPointer);
 
 void printTable();
