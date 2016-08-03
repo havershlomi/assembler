@@ -5,7 +5,7 @@
 if not exist return null*/
 Action* getActionByName(const char* name); 
 
-int addAction();
+int addActionToCodeCollection(char *action,char *actionAttr);
 
 int getOperandType(const char* oper);
 
@@ -16,3 +16,5 @@ int getActionRefrenceinMemory(int blaSrc, int blaDest);
 int getICPointer();
 
 void resetIc();
+
+void printCodeCollection();

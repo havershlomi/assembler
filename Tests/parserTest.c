@@ -40,8 +40,12 @@ if(isdigit(' '))
     updateSymbolTableRefrences(icPointer);
     printf("\nUpdated Table\n\n");
     printTable();
-    rewind(inputP);
+    if(inputP != NULL)
+		fclose(inputP);
+	inputP = fopen(argv[1],"r");
+    /*  rewind(inputP); */
     secondMove(inputP, "outputFile");
+    printCodeCollection();
 
 	if(inputP != NULL)
 		fclose(inputP);

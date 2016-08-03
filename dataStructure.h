@@ -53,4 +53,9 @@ typedef union word {
         unsigned int block4:3;
         unsigned int block5:3;
     } Base8;
+} WordDef;
+
+typedef struct{
+    WordDef *word;
+    int wordType;
 } Word;

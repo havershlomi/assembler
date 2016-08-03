@@ -1,8 +1,8 @@
 .entry LOOP
     .entry LENGTH
     .extern L3
-
 .extern    W
+
 MAIN: mov k[2-4]   ,    W
   add r2, STR
 

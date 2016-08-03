@@ -19,7 +19,7 @@ int getInstructionType(const char* instruction){
     else if(strcmp(instruction,"string") == 0)
         return string;
     else if(strcmp(instruction,"extern") == 0)
-        return externl;
+        return external;
     else if(strcmp(instruction,"entry") == 0)
         return entry;
     else
@@ -71,7 +71,7 @@ void firstMove(FILE* input){
                     isExternal = false;
                     commandType = instructionCommand;
                 } 
-                else if(instructionType == externl){
+                else if(instructionType == external){
                     if(isValidLabel(dataStr) == true){
                         isExternal = true;
                         dcPointer = 0;
@@ -82,7 +82,7 @@ void firstMove(FILE* input){
                     }
                 } 
                 if((hasLabel == true && (instructionType == data || instructionType == string))
-                    || (instructionType == externl && isExternal == true)){
+                    || (instructionType == external && isExternal == true)){
                     symbol = createSymbol(labelPtr, dcPointer, commandType, isExternal);
                     if(tryAddSymbol(symbol) == true){
                         printf( "added : %s\n", symbol -> name);
@@ -91,7 +91,7 @@ void firstMove(FILE* input){
             } else if((hasLabel == true && sscanf(str,"%*[^ \r\t:]%*[:] %[^ \r\t\n:] %[^\n] ",action, actionAttr) >= 1)
                 || (hasLabel == false && sscanf(str," %[^ \r\t\n:] %[^\n] ",action,actionAttr) >= 1)){
                 /*handle action*/
-                icPointer  = getActionBLAddress(action,actionAttr);
+                icPointer  = getActionBlockAddressType(action,actionAttr);
                 printf("%s|%d,%s\n",label,icPointer,actionAttr);
                 
                 if(hasLabel == true && icPointer != INVALID){
@@ -111,30 +111,31 @@ void firstMove(FILE* input){
 
 
 void secondMove(FILE* input, const char* fileName){
-    int instructionType = -1, dcPointer = -1, isExternal = false, commandType = none, icPointer = -1, refrencePointer = -1;
+    int instructionType = -1,  refrencePointer = -1;
     int hasLabel = false;
-    char label[30] = "", dataType[LINE_LENGTH] = "", action[4] = "",actionAttr[LINE_LENGTH] = "",*labelPtr;
+    char label[30] = "", dataType[LINE_LENGTH] = "", action[4] = "",actionAttr[LINE_LENGTH] = "";
     char labelDelimeter;
 	char str[LINE_LENGTH] = "", dataStr[LINE_LENGTH] = "";
-    Symbol *symbol;
+    char entryFileName[MAX_FILE_NAME] = ""; 
+    
+    sprintf(entryFileName, "%s.%s",fileName,"ent");
 
     resetIc();
     while(fgets(str,LINE_LENGTH,input) != NULL){
         printf("new sentence:  %s\n",str);
         hasLabel = false;
         actionAttr[0] = '\0';
-        
+
         if(str[0] != ';')
         {
+            
             /*try to find label*/
             if(sscanf(str,"%[^ \r\t:]%[:]",label,&labelDelimeter) == 2){
                 if(!isspace(str[0])  && isValidLabel(label) == true){
                     hasLabel = true; 
-                    labelPtr = label;
+                    
                 } else {
-                    printErr("label \"");
-                    printErr(label);
-                    printErr("\" is invalid.\n");
+                    printErr("label '%s' is invalid\n",label);
                 }
             }
             /*check if instruction*/
@@ -145,56 +146,30 @@ void secondMove(FILE* input, const char* fileName){
                 if(instructionType == invalidInstruction){
                     printErr("invalid instruction was found\n");
                 }
-                else if(instructionType == string || instructionType == data){
-                    break;
-                }
                 else if(instructionType == entry){
                     if(isValidLabel(dataStr) == true){
                         refrencePointer = getSymbolRefrenceByName(dataStr);
                         if(refrencePointer == SYMBOL_NOT_FOUND)
                         {
-                            printErr("Symbol: ");
-                            printErr(dataStr);
-                            printErr(" was not found in the symbol table\n");
+                            printErr("Symbol: %s was not found in the symbol table\n",dataStr);
                         } else {
-                            fileWrite(fileName, dataStr);
-                            fileWrite(fileName, &refrencePointer);
+                            fileWrite(entryFileName,"%s %d\n",dataStr,refrencePointer);
                         }
                     }
-                    else {
+                    else
+                    {
                         printErr("illegal symbol for .entry instruction \n");
-                    }
-                }
-                else if(instructionType == externl){
-                    if(isValidLabel(dataStr) == true){
-                        isExternal = true;
-                        dcPointer = 0;
-                        commandType = none;
-                        labelPtr = dataStr;
-                    } else {
-                        printErr("illegal symbol for .extern instruction \n");
+                    
                     }
                 } 
-                if((hasLabel == true && (instructionType == data || instructionType == string))
-                    || (instructionType == externl && isExternal == true)){
-                    symbol = createSymbol(labelPtr, dcPointer, commandType, isExternal);
-                    if(tryAddSymbol(symbol) == true){
-                        printf( "added : %s\n", symbol -> name);
-                    }
-                }
+
             } else if((hasLabel == true && sscanf(str,"%*[^ \r\t:]%*[:] %[^ \r\t\n] %[^\n] ",action, actionAttr) >= 1)
                 || (hasLabel == false && sscanf(str," %[^ \r\t\n:] %[^\n] ",action,actionAttr) >= 1)){
-                /*handle action*/
-                icPointer  = getActionBLAddress(action,actionAttr);
-                printf("handleAction: %s|%d|%s\n",label,icPointer,action);
                 
-                if(hasLabel == true && icPointer != INVALID){
-                    symbol = createSymbol(label, icPointer, actionCommand, isExternal);
-
-                    if(tryAddSymbol(symbol) == true){
-                        printf( "added : %s\n", symbol -> name);
-                    }
-                }
+                /*handle action*/
+                
+                addActionToCodeCollection(action,actionAttr);
+            
             } else if(sscanf(str," %[^ \t\r\n] ",dataStr) == 1){
                 /*if not empty line */
                 printErr("Invalid command \n");
@@ -218,21 +193,21 @@ int isValidLabel(char *label){
     return false;
 }
 
-int getActionBLAddress(char *action,char *actionAttr){
+
+
+int getActionBlockAddressType(char *action,char *actionAttr){
     Action *selectedAction;
     char firstOper[LINE_LENGTH] = "", secondOper[LINE_LENGTH] = "", extraData[LINE_LENGTH] = "";
     int blockAddressSourceType = -1, blockAddressDestType = -1;
 
+    /*find action*/
     selectedAction = getActionByName(action);
-    printf("'%s| %s'\n",action,actionAttr);
     if(selectedAction != NULL){
-        printf("Action: %s \n",selectedAction -> name);
+        /*handle action with 2 operands*/
         if(selectedAction -> numOfOperands == 2){
             if(sscanf(actionAttr," %[^ \r\t:,] , %[^ \r\t:] %[^\n] ",firstOper,secondOper,extraData) >= 2){
-                printf("%s \n %s \n %s\n",firstOper,secondOper,extraData);
                 if(strlen(extraData) != 0){
-                    printErr(action);
-                    printErr(" can not get more than 2 operands\n");
+                    printErr("%s can not get more than 2 operands\n",action);
                 } else {
                     blockAddressSourceType = getOperandType(firstOper);
                     blockAddressDestType = getOperandType(secondOper);
@@ -241,21 +216,17 @@ int getActionBLAddress(char *action,char *actionAttr){
                         && isValidBlockAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == true){
                         return getActionRefrenceinMemory(blockAddressSourceType, blockAddressDestType); 
                     } else {
-                        printErr("invalid block address method for action '");
-                        printErr(action);
-                        printErr("'\n");                
+                        printErr("invalid block address method for action '%s'\n'",action);                
                     }    
                 }
             } else {
-                printErr(action);
-                printErr(" except to get 2 operands\n");                
+                printErr("%s except to get 2 operands\n",action);                
             }
+            /*handle action with 1 operands*/
         } else if(selectedAction -> numOfOperands == 1){
             blockAddressDestType = getOperandType(actionAttr);
             if(isValidBlockAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == false){
-                printErr("invalid block address method for action '");
-                printErr(action);
-                printErr("'\n");
+                printErr("invalid block address method for action '%s' \n'",action);
             } else {
                 return getActionRefrenceinMemory(notUsedOper, blockAddressDestType);
             }   
