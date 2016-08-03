@@ -9,8 +9,8 @@
 #define LINE_LENGTH 80
 
 
-enum {false,true};
-enum instructions{data,string,entry,externl,invalidInstruction};
-enum commandType{actionCommand,instructionCommand,none};
+enum {false = 0,true = 1};
+enum instructions{data = 0,string = 1,entry = 2,externl = 3,invalidInstruction = -1};
+enum commandType{actionCommand = 1,instructionCommand = 2,none = 0};
 enum operandType{instant = 0, direct = 1, dynamic = 2, directRegister = 3, invalidOperand = -1, notUsedOper = -2};
 void printErr(const char* errMessage);

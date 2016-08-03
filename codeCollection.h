@@ -11,3 +11,5 @@ int getOperandType(const char* oper);
 int isValidBlockAddressTypeForAction(int sourcingType, int* validBLA);
 
 int getActionRefrenceinMemory(int blaSrc, int blaDest);
+
+int getDCPointer();

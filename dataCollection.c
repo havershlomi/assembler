@@ -1,5 +1,5 @@
 #include "dataCollection.h"
-int dc = 0;
+static int dc = 0;
 int dataCollection[1000];
 
 
@@ -25,5 +25,13 @@ int addNumbersData(int* dataArray, int arrayLength){
 }
 
 void clearData(){
+    int i = 0;
+    for(i = 0;i < dc; i++){
+        dataCollection[i] = 0;
+    }    
+    dc = 0;
+}
 
+int getDCPointer(){
+    return dc;
 }

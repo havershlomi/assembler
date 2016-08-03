@@ -2,10 +2,29 @@
 #include "symbolsTable.h"
 #include "utils.h"
 
+Symbol* createSymbol(char *label, int refrence, int commandType, int isExternal){
+    Symbol* symbol;
+    symbol = (Symbol*)malloc(sizeof(Symbol));
+    if(symbol){
+        memcpy(symbol -> name,label,30);
+        symbol -> isExternal = isExternal;
+        symbol -> refrence = refrence;
+        symbol -> commandType = commandType;
+        return symbol;
+    } else {
+        printErr("can not allocate space to the new symbol\n");
+        return NULL;
+    }
+}
+
 int tryAddSymbol(Symbol* symbol)
 {
     SymbolNode *newNode = 0, *prevPtr, *symbolPtr;
     char* symbolName = (*symbol).name;
+    if(symbol == NULL)
+    {
+	    return false;        
+    }
     if(symbolTable != NULL)
     {
         /*check if symbol is not in the table already*/
@@ -44,7 +63,7 @@ int tryAddSymbol(Symbol* symbol)
     } 
     else
     {
-        printErr("can not locate space to the new symbol\n");
+        printErr("can not allocate space to the new symbol\n");
         return false;
     }
     
@@ -85,6 +104,10 @@ void disposeSymbolsTable(){
         }
         symbolTable = NULL;
     }
+}
+
+void updateDataSymbolsRefrence(int icPointer){
+
 }
 
 void printTable(){

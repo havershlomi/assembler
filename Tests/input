@@ -5,3 +5,8 @@ dmov: dds d s
 .extern r5
 shlomi: mov r4, r4
 .extern data
+.extern L
+why: jsr r2
+why: stop 
+
+stop

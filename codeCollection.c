@@ -3,7 +3,7 @@
 
 extern Action ValidActions[];
 
-int ic = 100;
+static int ic = 100;
 
 Action* getActionByName(const char* name){
     int i = 0;
@@ -69,5 +69,9 @@ int getActionRefrenceinMemory(int blaSrc, int blaDest){
     }
     ic += numberOfRows;
 
+    return ic;
+}
+
+int getICPointer(){
     return ic;
 }

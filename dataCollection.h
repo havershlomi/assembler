@@ -4,3 +4,4 @@
 int addStringData(char* data);
 int addNumbersData(int* data, int arrayLength);
 void clearData();
+int getDCPointer();

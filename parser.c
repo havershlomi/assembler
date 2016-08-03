@@ -36,6 +36,7 @@ void firstMove(FILE* input){
     while(fgets(str,LINE_LENGTH,input) != NULL){
         printf("new sentence:  %s\n",str);
         hasLabel = false;
+        actionAttr[0] = '\0';
         
         if(str[0] != ';')
         {
@@ -81,28 +82,19 @@ void firstMove(FILE* input){
                 } 
                 if((hasLabel == true && (instructionType == data || instructionType == string))
                     || (instructionType == externl && isExternal == true)){
-                    symbol = (Symbol*)malloc(sizeof(Symbol));
-                    memcpy(symbol -> name,labelPtr,30);/*copy string into name and extrac into to a function*/
-                    symbol -> isExternal = isExternal;
-                    symbol -> refrence = dcPointer;
-                    symbol -> commandType = commandType;
-
+                    symbol = createSymbol(labelPtr, dcPointer, commandType, isExternal);
                     if(tryAddSymbol(symbol) == true){
                         printf( "added : %s\n", symbol -> name);
                     }
                 }
-            } else if((hasLabel == true && sscanf(str,"%*[^ \r\t:]%*[:] %[^ \r\t:] %[^\n] ",action, actionAttr) == 2)
-                || (hasLabel == false && sscanf(str," %s %[^\n] ",action,actionAttr) == 2)){
+            } else if((hasLabel == true && sscanf(str,"%*[^ \r\t:]%*[:] %[^ \r\t:] %[^\n] ",action, actionAttr) >= 1)
+                || (hasLabel == false && sscanf(str," %s %[^\n] ",action,actionAttr) >= 1)){
                 /*handle action*/
-                icPointer  = getActionBLAddress(action,actionAttr,hasLabel);
-                    printf("%s\n",label);
+                icPointer  = getActionBLAddress(action,actionAttr);
+                printf("%s\n",label);
                 
                 if(hasLabel == true && icPointer != INVALID){
-                    symbol = (Symbol*)malloc(sizeof(Symbol));
-                    memcpy(symbol -> name,label,30);
-                    symbol -> isExternal = false;
-                    symbol -> refrence = icPointer;
-                    symbol -> commandType = actionCommand;
+                    symbol = createSymbol(label, icPointer, actionCommand, isExternal);
 
                     if(tryAddSymbol(symbol) == true){
                         printf( "added : %s\n", symbol -> name);
@@ -131,7 +123,7 @@ int isValidLabel(char *label){
     return false;
 }
 
-int getActionBLAddress(char *action,char *actionAttr, const int hasLabel){
+int getActionBLAddress(char *action,char *actionAttr){
     Action *selectedAction;
     char firstOper[LINE_LENGTH] = "", secondOper[LINE_LENGTH] = "", extraData[LINE_LENGTH] = "";
     int blockAddressSourceType = -1, blockAddressDestType = -1;
@@ -175,7 +167,8 @@ int getActionBLAddress(char *action,char *actionAttr, const int hasLabel){
         }
         else {
             /*handle actions that have zero operands*/
-            if(sscanf(actionAttr," %[^\n] ",extraData) == 1){
+            printf("%s",actionAttr);
+            if(actionAttr != NULL && sscanf(actionAttr," %[^\n] ",extraData) == 1){
                 printErr(action);
                 printErr(" can not accept operands\n");               
             } else

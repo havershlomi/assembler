@@ -34,8 +34,10 @@ if(isdigit(' '))
         stdout = outputP;
     }
     getActionByName("stop");
-   firstMove(inputP);
-   printTable();
+    firstMove(inputP);
+    printTable();
+    disposeSymbolsTable();
+    printTable();
 	if(inputP != NULL)
 		fclose(inputP);
 	if(outputP != NULL)
