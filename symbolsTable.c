@@ -119,7 +119,6 @@ void updateSymbolTableRefrences(int icPointer){
             currentSymbol = (symbolNodePtr -> value);
             
             if(currentSymbol.isExternal == false && currentSymbol.commandType == instructionCommand){
-                printf("%s,%d",currentSymbol.name,currentSymbol.refrence);
                 symbolNodePtr -> value.refrence = currentSymbol.refrence + icPointer;
                 
             }

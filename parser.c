@@ -3,6 +3,7 @@
 #include "codeCollection.h"
 #include "dataCollection.h"
 #include "symbolsTable.h"
+#include "fileHandler.h"
 
 
 char *illegalLabelNames[24]={
@@ -32,9 +33,7 @@ void firstMove(FILE* input){
     char labelDelimeter;
 	char str[LINE_LENGTH] = "", dataStr[LINE_LENGTH] = "";
     Symbol *symbol;
-    Action* actionnn = getActionByName("stop");
-        if(actionnn == NULL)
-            printf("stopppppp");
+        
     while(fgets(str,LINE_LENGTH,input) != NULL){
         printf("new sentence:  %s\n",str);
         hasLabel = false;
@@ -111,8 +110,8 @@ void firstMove(FILE* input){
 }
 
 
-void secondMove(FILE* input){
-    int instructionType = -1, dcPointer = -1, isExternal = false, commandType = none, icPointer = -1;
+void secondMove(FILE* input, const char* fileName){
+    int instructionType = -1, dcPointer = -1, isExternal = false, commandType = none, icPointer = -1, refrencePointer = -1;
     int hasLabel = false;
     char label[30] = "", dataType[LINE_LENGTH] = "", action[4] = "",actionAttr[LINE_LENGTH] = "",*labelPtr;
     char labelDelimeter;
@@ -132,7 +131,6 @@ void secondMove(FILE* input){
                 if(!isspace(str[0])  && isValidLabel(label) == true){
                     hasLabel = true; 
                     labelPtr = label;
-                    printf("symbolFound:%s\n",label);
                 } else {
                     printErr("label \"");
                     printErr(label);
@@ -149,6 +147,23 @@ void secondMove(FILE* input){
                 }
                 else if(instructionType == string || instructionType == data){
                     break;
+                }
+                else if(instructionType == entry){
+                    if(isValidLabel(dataStr) == true){
+                        refrencePointer = getSymbolRefrenceByName(dataStr);
+                        if(refrencePointer == SYMBOL_NOT_FOUND)
+                        {
+                            printErr("Symbol: ");
+                            printErr(dataStr);
+                            printErr(" was not found in the symbol table\n");
+                        } else {
+                            fileWrite(fileName, dataStr);
+                            fileWrite(fileName, &refrencePointer);
+                        }
+                    }
+                    else {
+                        printErr("illegal symbol for .entry instruction \n");
+                    }
                 }
                 else if(instructionType == externl){
                     if(isValidLabel(dataStr) == true){

@@ -1,4 +1,4 @@
-#define SYMBOL_NOT_FOUND -1;
+#define SYMBOL_NOT_FOUND -1
 /*checks if a the symbol is in the list
 true - print an error
 false - add it to the list

@@ -33,13 +33,16 @@ if(isdigit(' '))
         /*replace the standared output with the file providerd by the user*/
         stdout = outputP;
     }
-    getActionByName("stop");
+    
     firstMove(inputP);
     icPointer = getICPointer();
     printTable();
     updateSymbolTableRefrences(icPointer);
     printf("\nUpdated Table\n\n");
     printTable();
+    rewind(inputP);
+    secondMove(inputP, "outputFile");
+
 	if(inputP != NULL)
 		fclose(inputP);
 	if(outputP != NULL)

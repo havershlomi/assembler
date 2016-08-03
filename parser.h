@@ -4,3 +4,4 @@ int addDataInstructionToDC(char *dataStr);
 int getInstructionType(const char* instruction);
 int isValidLabel(char *label);
 void firstMove(FILE* input);
+void secondMove(FILE* input, const char* fileName);
