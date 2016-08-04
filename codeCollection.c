@@ -25,7 +25,7 @@ int addActionToCodeCollection(char *action,char *actionAttr){
 
                     if(isValidBlockAddressTypeForAction(blockAddressSourceType,selectedAction -> sourceOper) == true
                         && isValidBlockAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == true){
-                        return getActionRefrenceinMemory(blockAddressSourceType, blockAddressDestType); 
+                        /* return getActionRefrenceinMemory(blockAddressSourceType, blockAddressDestType);*/ 
                     } else {
                         printErr("invalid block address method for action '%s'\n'",action);                
                     }    
@@ -39,7 +39,12 @@ int addActionToCodeCollection(char *action,char *actionAttr){
             if(isValidBlockAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == false){
                 printErr("invalid block address method for action '%s' \n'",action);
             } else {
-                return getActionRefrenceinMemory(notUsedOper, blockAddressDestType);
+            printf("%d",blockAddressDestType);
+                /*return getActionRefrenceinMemory(notUsedOper, blockAddressDestType);*/
+                wordDef = createCommandWord(selectedAction -> binaryIndex, selectedAction -> numOfOperands,
+                0,blockAddressDestType,absolute);
+                /* chack which ERA comes here check if need to write to extern file*/
+                addToCollection(wordDef,commandType);
             }   
         }
         else {
@@ -47,17 +52,9 @@ int addActionToCodeCollection(char *action,char *actionAttr){
             if(actionAttr != NULL && sscanf(actionAttr," %[^\n] ",extraData) == 1){
                 printErr("%s can not accept operands\n",action);               
             } else {
-                wordDef = (WordDef*)malloc(sizeof(WordDef));
-
-                if(wordDef != NULL){
-                    wordDef -> command.opCode = selectedAction -> binaryIndex;
-                    wordDef -> command.dest = 0;
-                    wordDef -> command.src = 0;
-                    wordDef -> command.group = selectedAction -> numOfOperands;
-                    wordDef -> command.ERA = absolute;
-                    codeCollection[ic].word = wordDef;
-                    ic++;
-                }
+                wordDef = createCommandWord(selectedAction -> binaryIndex, selectedAction -> numOfOperands,
+                0,0,absolute);
+                addToCollection(wordDef,commandType);
             }
         }
     }
@@ -65,6 +62,27 @@ int addActionToCodeCollection(char *action,char *actionAttr){
         printErr("the action name is invalid\n");
     }
     return INVALID;
+}
+void addToCollection(WordDef * wordDef, int wordType){
+    codeCollection[ic].word = wordDef;
+    codeCollection[ic].wordType = wordType;
+    ic++;
+}
+
+WordDef* createCommandWord(int opCode, int group, int src, int dest, int Era){
+    WordDef* wordDef = (WordDef*)malloc(sizeof(WordDef));
+
+    if(wordDef != NULL){
+        wordDef -> command.notUsed = NOT_USED_DEFAULT_VALUE;
+        wordDef -> command.opCode = opCode;
+        wordDef -> command.group = group;
+        wordDef -> command.dest = 0;
+        wordDef -> command.src = 0;
+        wordDef -> command.ERA = Era;
+        return wordDef;
+    }
+    printErr("can not create a command Word\n");
+    return NULL;
 }
 
 
@@ -145,15 +163,19 @@ void resetIc(){
 
 
 void printCodeCollection(){
-    /*Word *word;
+    Word *word;
     int i = 0;
     
     printf("|notUsed|Group|opCode|SRC|DEST|ERA|\n");
     for(i = 0; i < ic; i++)
     {
-        word = codeCollection[i];
-        printf("%d|%d|%d|%d|%d|%d\n",word -> command.notUsed,word -> command.group,word -> command.opCode,
-        word -> command.src,word -> command.dest,wordDef -> command.ERA);
-    }*/
+        word = &codeCollection[i];
+        if(word != NULL && word -> word != NULL){
+            if(word -> wordType == commandType){
+                printf("%d|%d|%d|%d|%d|%d\n",word -> word -> command.notUsed,word -> word -> command.group,word -> word -> command.opCode,
+                word -> word -> command.src,word -> word -> command.dest,word -> word -> command.ERA);
+            }
+        }
+    }
     
 }

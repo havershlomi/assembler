@@ -1,3 +1,4 @@
+#define NOT_USED_DEFAULT_VALUE 5 
 typedef struct symbol {
     char name[30];
     int refrence;

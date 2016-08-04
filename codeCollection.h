@@ -18,3 +18,6 @@ int getICPointer();
 void resetIc();
 
 void printCodeCollection();
+
+WordDef* createCommandWord(int opCode, int group, int src, int dest, int Era);
+void addToCollection(WordDef * wordDef, int wordType);
