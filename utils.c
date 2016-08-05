@@ -14,7 +14,7 @@ void int2bin(const int a) {
 int i = 0;
 printf("\n");
     b = a;
-    for ( i = 0; i < 13; i++) {
+    for ( i = 0; i < 15; i++) {
         printf("%c",(b & 1) +'0');
 
         b >>= 1;
@@ -23,7 +23,7 @@ printf("\n");
 int cutByBits(const int number, int from, int to){
     int i = 0, result = number, rangeSize = to - from;
     char bitSign = '0';
-printErr("%d\n",number);
+
     /*cut all the bits until from*/
     int2bin(result);
     result >>= from;
@@ -38,6 +38,6 @@ printErr("%d\n",number);
             result = result & ~(1 << i) ;
     }
     
-    int2bin(result);
     return result;
 }
+

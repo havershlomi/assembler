@@ -250,16 +250,13 @@ unsigned int getWordNumberByRefrenceID(int refrenceID){
         wordDef = word -> word;
         if(wordDef){
             /*shift bits to get the number they represent*/
-            result = result | (wordDef -> command.ERA);
-            result = result | (wordDef -> command.dest << 2);
-            result = result | (wordDef -> command.src << 4);
-            result = result | (wordDef -> command.opCode << 6);
-            result = result | (wordDef -> command.group << 10);
-            result = result | (wordDef -> command.notUsed << 12);
+           result = convertCommandWordToInt(wordDef);
         }
     }
     return result;
 }
+
+
 /* get data word */
 /* createDirectWord get a word defining an by symbol
 
@@ -414,15 +411,47 @@ void printCodeCollection(){
         word = &codeCollection[i];
         if(word != NULL && word -> word != NULL){
             if(word -> wordType == commandType){
-                printf("%d|%d|%d|%d|%d|%d\n",word -> word -> command.notUsed,word -> word -> command.group,word -> word -> command.opCode,
-                word -> word -> command.src,word -> word -> command.dest,word -> word -> command.ERA);
+                /*printf("%d|%d|%d|%d|%d|%d\n",word -> word -> command.notUsed,word -> word -> command.group,word -> word -> command.opCode,
+                word -> word -> command.src,word -> word -> command.dest,word -> word -> command.ERA);*/
+                int2bin(convertCommandWordToInt(word -> word));
             }  else if(word -> wordType == registerValueType){
-                printf(" %d | %d | %d | %d \n",word -> word -> registerValue.notUsed, word -> word -> registerValue.src,
-                word -> word -> registerValue.dest,word -> word -> registerValue.ERA);
+            /*    printf(" %d | %d | %d | %d \n",word -> word -> registerValue.notUsed, word -> word -> registerValue.src,
+                word -> word -> registerValue.dest,word -> word -> registerValue.ERA);*/
+                int2bin(convertRegisterValueWordToInt(word -> word));
+                
             }  else if(word -> wordType == regularValueType){
-                printf(" %d | %d \n",word -> word -> regularValue.value, word -> word -> regularValue.ERA);
+                /*printf(" %d | %d \n",word -> word -> regularValue.value, word -> word -> regularValue.ERA);*/
+                int2bin(convertRegularValueWordToInt(word -> word));
+                
             }
+            printf("\n");
         }
     }
     
+}
+unsigned int convertCommandWordToInt(WordDef *wordDef){
+    int result = 0;
+    result = result | (wordDef -> command.ERA);
+    result = result | (wordDef -> command.dest << 2);
+    result = result | (wordDef -> command.src << 4);
+    result = result | (wordDef -> command.opCode << 6);
+    result = result | (wordDef -> command.group << 10);
+    result = result | (wordDef -> command.notUsed << 12);
+
+    return result;
+}
+unsigned int convertRegisterValueWordToInt(WordDef *wordDef){
+    int result = 0;
+    result = result | (wordDef -> registerValue.ERA);
+    result = result | (wordDef -> registerValue.dest << 2);
+    result = result | (wordDef -> registerValue.src << 8);
+    result = result | (wordDef -> registerValue.notUsed << 14);
+    
+    return result;
+}
+unsigned int convertRegularValueWordToInt(WordDef *wordDef){
+    int result = 0;
+    result = result | (wordDef -> regularValue.ERA);
+    result = result | (wordDef -> regularValue.value << 2);
+    return result;
 }

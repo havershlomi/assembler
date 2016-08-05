@@ -30,3 +30,6 @@ WordDef* createDirectWord(char* value);
 WordDef* createDynamicWord(char* value);
 
 unsigned int getWordNumberByRefrenceID(int refrenceID);
+unsigned int convertCommandWordToInt(WordDef *wordDef);
+unsigned int convertRegisterValueWordToInt(WordDef *wordDef);
+unsigned int convertRegularValueWordToInt(WordDef *wordDef);
