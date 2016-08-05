@@ -1,9 +1,84 @@
 #include "codeCollection.h"
+#include "dataCollection.h"
 #include "utils.h"
 
 extern Action ValidActions[];
 static int ic = 0;
 static Word codeCollection[1000];
+ 
+int getActionAddressingType(char *action,char *actionAttr){
+    Action *selectedAction;
+    char firstOper[LINE_LENGTH] = "", secondOper[LINE_LENGTH] = "", extraData[LINE_LENGTH] = "";
+    int srcAddressingType = 0, destAddressingType = 0, icPointer = INVALID;
+
+    /*find action*/
+    selectedAction = getActionByName(action);
+    if(selectedAction != NULL){
+        /*handle action with 2 operands*/
+        if(selectedAction -> numOfOperands == 2){
+            if(sscanf(actionAttr," %[^ \r\t:,] , %[^ \r\t:] %[^\n] ",firstOper,secondOper,extraData) >= 2){
+                if(strlen(extraData) != 0){
+                    printErr("%s can not get more than 2 operands\n",action);
+                } else {
+                    srcAddressingType = getOperandType(firstOper);
+                    destAddressingType = getOperandType(secondOper);
+
+                    if(isValidAddressTypeForAction(srcAddressingType,selectedAction -> sourceOper) == true
+                        && isValidAddressTypeForAction(destAddressingType,selectedAction -> destOper) == true){
+                        icPointer = addActionWord(selectedAction -> binaryIndex, selectedAction -> numOfOperands,
+                                        srcAddressingType,destAddressingType);                        
+                        
+                        getActionRefrenceinMemory(srcAddressingType, destAddressingType);  
+                    } else {
+                        printErr("invalid block address method for action '%s'\n'",action);                
+                    }    
+                }
+            } else {
+                printErr("%s except to get 2 operands\n",action);                
+            }
+            /*handle action with 1 operands*/
+        } else if(selectedAction -> numOfOperands == 1){
+            destAddressingType = getOperandType(actionAttr);
+            if(isValidAddressTypeForAction(destAddressingType,selectedAction -> destOper) == false){
+                printErr("invalid block address method for action '%s' \n'",action);
+            } else {
+                icPointer = addActionWord(selectedAction -> binaryIndex, selectedAction -> numOfOperands,
+                0,destAddressingType);
+                getActionRefrenceinMemory(notUsedOper, destAddressingType);
+            }   
+        }
+        else {
+            /*handle actions that have zero operands*/
+            printf("%s",actionAttr);
+            if(actionAttr != NULL && sscanf(actionAttr," %[^\n] ",extraData) == 1){
+                printErr(action);
+                printErr(" can not accept operands\n");               
+            } else {
+                
+                icPointer = addActionWord(selectedAction -> binaryIndex, selectedAction -> numOfOperands,0,0);
+                getActionRefrenceinMemory(notUsedOper, notUsedOper);
+            }
+        }
+    }
+    else {
+        printErr("the action name is invalid\n");
+    }
+    return icPointer;
+}
+
+int addActionWord(int actionIndex, int numOfOperands,int srcAddressingType,int destAddressingType){
+    int icPointer = INVALID;
+    WordDef * wordDef;
+
+    wordDef = createCommandWord(actionIndex, numOfOperands,
+                srcAddressingType,destAddressingType,absolute);
+    if(wordDef){
+        icPointer = addToCollection(wordDef,commandType);
+    }
+
+    return icPointer;
+}
+
 
 int addActionToCodeCollection(char *action,char *actionAttr){
     Action *selectedAction;
@@ -22,13 +97,12 @@ int addActionToCodeCollection(char *action,char *actionAttr){
                 } else {
                     srcAddressingType = getOperandType(firstOper);                    
                     destAddressingType = getOperandType(secondOper);
-
                     if(isValidAddressTypeForAction(srcAddressingType,selectedAction -> sourceOper) == true
                         && isValidAddressTypeForAction(destAddressingType,selectedAction -> destOper) == true){
-
+                        
                         if((srcAddressingType == directRegister && destAddressingType == directRegister) || 
                             (srcAddressingType == directRegister || destAddressingType == directRegister)){
-                            wordDef = getRegisterWord(srcAddressingType,firstOper, destAddressingType, secondOper);
+                            wordDef = createRegisterWord(srcAddressingType,firstOper, destAddressingType, secondOper);
                             addToCollection(wordDef, registerValueType);
                         }
                         
@@ -48,25 +122,19 @@ int addActionToCodeCollection(char *action,char *actionAttr){
             if(isValidAddressTypeForAction(destAddressingType,selectedAction -> destOper) == false){
                 printErr("invalid block address method for action '%s' \n'",action);
             } else {
-                wordDef = createCommandWord(selectedAction -> binaryIndex, selectedAction -> numOfOperands,
-                0,destAddressingType,absolute);
-                /* chack which ERA comes here check if need to write to extern file*/
-                addToCollection(wordDef,commandType);
+                
                 if(destAddressingType == directRegister){
-                    wordDef = getRegisterWord(notUsedOper, NULL, destAddressingType, actionAttr);
+                    wordDef = createRegisterWord(notUsedOper, NULL, destAddressingType, actionAttr);
                     addToCollection(wordDef, registerValueType);
-                }
-                addDataWordToCollection(destAddressingType, actionAttr);                
+                }else{
+                    addDataWordToCollection(destAddressingType, actionAttr);
+                }                
             }   
         }
         else {
             /*handle actions that have zero operands*/
             if(actionAttr != NULL && sscanf(actionAttr," %[^\n] ",extraData) == 1){
                 printErr("%s can not accept operands\n",action);               
-            } else {
-                wordDef = createCommandWord(selectedAction -> binaryIndex, selectedAction -> numOfOperands,
-                0,0,absolute);
-                addToCollection(wordDef,commandType);
             }
         }
     }
@@ -76,7 +144,12 @@ int addActionToCodeCollection(char *action,char *actionAttr){
     return INVALID;
 }
 int addToCollection(WordDef * wordDef, int wordType){
-    int currentIc = ic;
+    int currentIc;
+    /*find the first slot open*/
+    while(codeCollection[ic].word){
+        ic++;
+    }
+    currentIc = ic;
     codeCollection[ic].word = wordDef;
     codeCollection[ic].wordType = wordType;
     ic++;
@@ -101,50 +174,58 @@ WordDef* createCommandWord(int opCode, int group, int src, int dest, int Era){
 
 void addDataWordToCollection(int addressingType, char* value){
     WordDef * wordDef;
-    int addedAt = -1, dataType = -1;
-    if(addressingType == instant){
-        wordDef = getInstantWord(value);
+    int addedAtRow = -1, dataType = -1;
+    if(addressingType == directRegister){
+        return;
+    }
+    else if(addressingType == instant){
+        wordDef = createInstantWord(value);
         dataType = regularValueType;
     } else if(addressingType == direct){
-        wordDef = getDirectWord(value);
+        wordDef = createDirectWord(value);
         dataType = regularValueType;
     } else if(addressingType == dynamic){
-        wordDef = getDynamicWord(value);
+        wordDef = createDynamicWord(value);
         dataType = regularValueType;        
     }
     
     if(wordDef){
-        addedAt = addToCollection(wordDef, dataType);
-printf("%d",addedAt);
-        /*if(wordDef -> regularValue.ERA == externalData){
-            externalWriteToFile("%s %d\n",value, addedAt);
-        }*/
+        addedAtRow = addToCollection(wordDef, dataType);
+        if(wordDef -> regularValue.ERA == externalData){
+            externalWriteToFile("%s %d\n",value,addedAtRow);
+        }
     }
 }
 
 /* get data word */
-/* getDirectWord get a word defining an by symbol
+/* createDirectWord get a word defining an by symbol
 
 */
-WordDef* getDynamicWord(char* value){
+WordDef* createDynamicWord(char* value){
     WordDef * word;
     Symbol * symbol;
     char symbolName[LINE_LENGTH] = "";
-    int fromBit = -1, toBit = -1, refrence = -1;
+    int fromBit = -1, toBit = -1, refrence = -1, data = 0;
     if(sscanf(value,"%[^[][%d-%d]",symbolName,&fromBit,&toBit) == 3 
         && fromBit < toBit && fromBit >= 0 && toBit <= 13){
         
         symbol = getSymbolByName(symbolName);
-        if(symbol == NULL){
+        if(!symbol){
             printErr("%s is never defined.\n",value);
         } else {
 
             word = (WordDef*)malloc(sizeof(WordDef));
-            if(word != NULL){
-                refrence = symbol -> refrence;
-                word -> regularValue.value = refrence;
+            if(word){
+
+                refrence = symbol -> icRefrence;
+                if(symbol -> commandType == instructionCommand){
+                    refrence = symbol -> dcRefrence;
+                    data = getDataByID(refrence);                    
+                } else if(symbol -> commandType == actionCommand){
+                    data = getWordNumberByRefrenceID(refrence);
+                }
+                word -> regularValue.value = cutByBits(data, fromBit, toBit);                
                 word -> regularValue.ERA = absolute;
-                
                 
             } else {
                 printErr("can't allocate space for new word \n");
@@ -157,19 +238,41 @@ WordDef* getDynamicWord(char* value){
     return word;
 }
 
+/* get ic refrence and return the number that represents the command word */
+unsigned int getWordNumberByRefrenceID(int refrenceID){
+    unsigned int result = 0;
+    Word * word;
+    WordDef *  wordDef;
+    word = &codeCollection[refrenceID - IC_START_POSITION];
+    if(!word)
+        printErr("there is no word in this index: %d\n",refrenceID);
+    else {
+        wordDef = word -> word;
+        if(wordDef){
+            /*shift bits to get the number they represent*/
+            result = result | (wordDef -> command.ERA);
+            result = result | (wordDef -> command.dest << 2);
+            result = result | (wordDef -> command.src << 4);
+            result = result | (wordDef -> command.opCode << 6);
+            result = result | (wordDef -> command.group << 10);
+            result = result | (wordDef -> command.notUsed << 12);
+        }
+    }
+    return result;
+}
 /* get data word */
-/* getDirectWord get a word defining an by symbol
+/* createDirectWord get a word defining an by symbol
 
 */
-WordDef* getDirectWord(char* value){
+WordDef* createDirectWord(char* value){
     WordDef * word;
     Symbol * symbol;
     symbol = getSymbolByName(value);
     if(symbol != NULL){
         word = (WordDef*)malloc(sizeof(WordDef));
         if(word != NULL){
-            word -> regularValue.value = symbol -> refrence;
-            word -> regularValue.ERA = absolute;
+            word -> regularValue.value = symbol -> icRefrence;
+            word -> regularValue.ERA = relocatable;
             if((symbol -> isExternal) == true)
             {
                 word -> regularValue.ERA = externalData;
@@ -185,10 +288,10 @@ WordDef* getDirectWord(char* value){
 }
 
 /* get data word */
-/* getInstantWord get a word defining an instatnt word
+/* createInstantWord get a word defining an instatnt word
 
 */
-WordDef* getInstantWord(char* value){
+WordDef* createInstantWord(char* value){
     WordDef * word;    
     int number = 0;
     char sign = '+';
@@ -209,7 +312,7 @@ WordDef* getInstantWord(char* value){
     return word;
 }
 
-WordDef* getRegisterWord(int srcAddressType, char* srcWord, int destAdressType, char* destWord){
+WordDef* createRegisterWord(int srcAddressType, char* srcWord, int destAdressType, char* destWord){
     WordDef * word;    
     int srcNumber = 0, destNumber = 0;
     
@@ -242,29 +345,26 @@ Action* getActionByName(const char* name){
 }
 
 int getOperandType(const char* oper){
-    int number = -1, number2 = -1;
+    int number = -1, number2 = -1, operandType = invalidOperand;
     char operAttr[LINE_LENGTH]  = "", extraData[LINE_LENGTH] = "";
     
     if(sscanf(oper," #%*[-+]%d %[^\n]",&number,extraData) >= 1 ||
         sscanf(oper," #%d %[^\n]",&number,extraData) >= 1){
         if(strlen(extraData) == 0 && number != -1)
-        {
-            return instant;
-        }
+            operandType = instant;
     } else if(sscanf(oper," %*[r]%d %[^\n]",&number,extraData) >= 1){
         if(number >= 0 && number <= 7 && strlen(extraData) == 0)
-            return directRegister;
+            operandType = directRegister;
     } else if(sscanf(oper," %*[^[][%d-%d] %[^\n]",&number,&number2,extraData) >= 2 ||
             sscanf(oper," %*[^[][%d-] %[^\n]",&number,extraData) >= 1 ||
             sscanf(oper," %*[^[][-%d] %[^\n]",&number,extraData) >= 1){
         if(strlen(extraData) == 0 && number < number2 && number >= 0 && number2 <= 13)
-            return dynamic;
+            operandType = dynamic;
     } else if(sscanf(oper," %[^ \t\r] %[^\n]",operAttr,extraData) >= 1 && strchr(oper,'[') == NULL
-             && strchr(oper,']') == NULL){
-        if(strlen(extraData) == 0)
-            return direct;
+             && strchr(oper,']') == NULL && strlen(extraData) == 0){
+            operandType = direct;
     } 
-    return invalidOperand;
+    return operandType;
 }
 
 int isValidAddressTypeForAction(int sourcingType, int* validBLA){
@@ -280,7 +380,7 @@ int isValidAddressTypeForAction(int sourcingType, int* validBLA){
 }
 
 int getActionRefrenceinMemory(int blaSrc, int blaDest){
-    int numberOfRows = 1, currentIc = ic;
+    int numberOfRows = 0, currentIc = ic;
     if(blaDest == directRegister && blaSrc == directRegister){
         numberOfRows += 1;
     } else if(blaSrc != notUsedOper && blaDest != notUsedOper){
@@ -289,7 +389,7 @@ int getActionRefrenceinMemory(int blaSrc, int blaDest){
     else if((blaSrc == notUsedOper && blaDest != notUsedOper) ||
             (blaDest == notUsedOper && blaSrc != notUsedOper)){
         numberOfRows += 1;
-    }
+    } 
     ic += numberOfRows;
 
     return currentIc + IC_START_POSITION;

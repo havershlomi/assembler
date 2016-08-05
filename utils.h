@@ -17,3 +17,5 @@ enum operandType{instant = 0, direct = 1, dynamic = 2, directRegister = 3, inval
 enum wordType { commandType = 1, registerValueType = 2, regularValueType = 3, base8Type = 4, dataType = 5};
 enum ERA { absolute = 0, externalData = 1, relocatable = 2};
 void printErr(char * format,...);
+int cutByBits(const int number, int from, int to);
+void int2bin(const int);

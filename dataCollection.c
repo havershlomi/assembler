@@ -12,7 +12,6 @@ int addStringData(char* data)
     }
     dataCollection[dc] = '\0';
     dc++;
-    printf("%s, dc: %d",data,currentDc);
     return currentDc;
 }
 
@@ -23,6 +22,10 @@ int addNumbersData(int* dataArray, int arrayLength){
         dc++;
     }    
     return currentDc;
+}
+
+int getDataByID(int dcRefrenceID){
+    return dataCollection[dcRefrenceID];    
 }
 
 void clearData(){

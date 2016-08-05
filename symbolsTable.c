@@ -8,8 +8,9 @@ Symbol* createSymbol(char *label, int refrence, int commandType, int isExternal)
     if(symbol){
         memcpy(symbol -> name,label,30);
         symbol -> isExternal = isExternal;
-        symbol -> refrence = refrence;
+        symbol -> icRefrence = refrence;
         symbol -> commandType = commandType;
+        symbol -> dcRefrence = refrence;
         return symbol;
     } else {
         printErr("can not allocate space to the new symbol\n");
@@ -91,7 +92,7 @@ Symbol* getSymbolByName(char* symbolName){
 int getSymbolRefrenceByName(char* symbolName){
     Symbol *symbolPtr = getSymbolByName(symbolName);
     if(symbolPtr != NULL)
-        return symbolPtr -> refrence;
+        return symbolPtr -> icRefrence;
     return SYMBOL_NOT_FOUND;
 }
 
@@ -124,7 +125,7 @@ void updateSymbolTableRefrences(int icPointer){
             currentSymbol = (symbolNodePtr -> value);
             
             if(currentSymbol.isExternal == false && currentSymbol.commandType == instructionCommand){
-                symbolNodePtr -> value.refrence = currentSymbol.refrence + icPointer;
+                symbolNodePtr -> value.icRefrence = currentSymbol.icRefrence + icPointer;
                 
             }
             symbolNodePtr = symbolNodePtr -> next;
@@ -141,8 +142,8 @@ void printTable(){
         symbolPtr = symbolTable;
         while(symbolPtr != NULL)
         {
-            printf("%s|%d|%d|%d\n",symbolPtr -> value.name,symbolPtr -> value.refrence,symbolPtr -> value.isExternal,
-            symbolPtr -> value.commandType);
+            printf("%s|%d|%d|%d|%d\n",symbolPtr -> value.name,symbolPtr -> value.icRefrence,symbolPtr -> value.isExternal,
+            symbolPtr -> value.commandType,symbolPtr -> value.dcRefrence);
             symbolPtr = symbolPtr -> next;
         }
     }

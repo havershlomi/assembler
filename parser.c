@@ -46,11 +46,8 @@ void firstMove(FILE* input){
                 if(!isspace(str[0])  && isValidLabel(label) == true){
                     hasLabel = true; 
                     labelPtr = label;
-                    printf("symbolFound:%s\n",label);
                 } else {
-                    printErr("label \"");
-                    printErr(label);
-                    printErr("\" is invalid.\n");
+                    printErr("label \"%s\" is invalid.\n",label);
                 }
             }
             /*check if instruction*/
@@ -188,57 +185,6 @@ int isValidLabel(char *label){
 
 
 
-int getActionAddressingType(char *action,char *actionAttr){
-    Action *selectedAction;
-    char firstOper[LINE_LENGTH] = "", secondOper[LINE_LENGTH] = "", extraData[LINE_LENGTH] = "";
-    int blockAddressSourceType = -1, blockAddressDestType = -1;
-
-    /*find action*/
-    selectedAction = getActionByName(action);
-    if(selectedAction != NULL){
-        /*handle action with 2 operands*/
-        if(selectedAction -> numOfOperands == 2){
-            if(sscanf(actionAttr," %[^ \r\t:,] , %[^ \r\t:] %[^\n] ",firstOper,secondOper,extraData) >= 2){
-                if(strlen(extraData) != 0){
-                    printErr("%s can not get more than 2 operands\n",action);
-                } else {
-                    blockAddressSourceType = getOperandType(firstOper);
-                    blockAddressDestType = getOperandType(secondOper);
-
-                    if(isValidAddressTypeForAction(blockAddressSourceType,selectedAction -> sourceOper) == true
-                        && isValidAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == true){
-                        return getActionRefrenceinMemory(blockAddressSourceType, blockAddressDestType); 
-                    } else {
-                        printErr("invalid block address method for action '%s'\n'",action);                
-                    }    
-                }
-            } else {
-                printErr("%s except to get 2 operands\n",action);                
-            }
-            /*handle action with 1 operands*/
-        } else if(selectedAction -> numOfOperands == 1){
-            blockAddressDestType = getOperandType(actionAttr);
-            if(isValidAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == false){
-                printErr("invalid block address method for action '%s' \n'",action);
-            } else {
-                return getActionRefrenceinMemory(notUsedOper, blockAddressDestType);
-            }   
-        }
-        else {
-            /*handle actions that have zero operands*/
-            printf("%s",actionAttr);
-            if(actionAttr != NULL && sscanf(actionAttr," %[^\n] ",extraData) == 1){
-                printErr(action);
-                printErr(" can not accept operands\n");               
-            } else
-                return getActionRefrenceinMemory(notUsedOper, notUsedOper);
-        }
-    }
-    else {
-        printErr("the action name is invalid\n");
-    }
-    return INVALID;
-}
 
 /*gets the  string instruction and extract all the numbers and save them*/
 int addStringInstructionToDC(char *dataStr){

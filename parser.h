@@ -1,4 +1,3 @@
-int getActionAddressingType(char *action,char *actionAttr);
 int addStringInstructionToDC(char *dataStr);
 int addDataInstructionToDC(char *dataStr);
 int getInstructionType(const char* instruction);

@@ -32,6 +32,7 @@ void entryWriteToFile(char * format,...){
 }
 void objWriteToFile(char * format,...){
     va_list arg;
+    
     if(objFile){
         va_start(arg, format);
         vfprintf(objFile, format, arg);
@@ -40,6 +41,7 @@ void objWriteToFile(char * format,...){
 }
 void externalWriteToFile(char * format,...){
     va_list arg;
+    
     if(externalFile){
         va_start(arg, format);
         vfprintf(externalFile, format, arg);

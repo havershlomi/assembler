@@ -1,9 +1,10 @@
 #define NOT_USED_DEFAULT_VALUE 5 
 typedef struct symbol {
     char name[30];
-    int refrence;
+    int icRefrence;
     int commandType;
     int isExternal;
+    int dcRefrence;
 } Symbol;
 
 typedef struct symbolNode {
@@ -22,9 +23,7 @@ typedef struct action {
 } Action;
 
 typedef union word {
-    struct data{
-        unsigned int cell:15;
-    } data;
+    unsigned int cell:15;
     /*Binary command |notUsed|Group|opCode|SRC|DEST|ERA|*/
     struct {
         unsigned int ERA:2;
