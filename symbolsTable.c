@@ -69,8 +69,7 @@ int tryAddSymbol(Symbol* symbol)
     
     return true;
 }
-
-int getSymbolRefrenceByName(char* symbolName){
+Symbol* getSymbolByName(char* symbolName){
     SymbolNode *symbolPtr;
     
     if(symbolTable != NULL)
@@ -82,11 +81,17 @@ int getSymbolRefrenceByName(char* symbolName){
             if(symbolPtr -> value.name != '\0' &&
                 strcmp(symbolPtr -> value.name, symbolName) == 0)
             {
-                return symbolPtr -> value.refrence;               
+                return &(symbolPtr -> value);               
             }
             symbolPtr = symbolPtr -> next;
         }
     }
+    return NULL;
+}
+int getSymbolRefrenceByName(char* symbolName){
+    Symbol *symbolPtr = getSymbolByName(symbolName);
+    if(symbolPtr != NULL)
+        return symbolPtr -> refrence;
     return SYMBOL_NOT_FOUND;
 }
 

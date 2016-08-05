@@ -5,6 +5,7 @@
 #include "../parser.h"
 #include "../codeCollection.h"
 #include "../symbolsTable.h"
+#include "../fileHandler.h"
 
 
  
@@ -14,8 +15,6 @@ int main(int argc, char* argv[])
  	FILE * inputP,*outputP = NULL;
      int icPointer = -1;
 
-if(isdigit(' '))
-        printf("isDDigit");
     /*load the files if needed*/
     if(argc > 1){
         if((inputP = fopen(argv[1],"r")) == NULL){
@@ -33,20 +32,19 @@ if(isdigit(' '))
         /*replace the standared output with the file providerd by the user*/
         stdout = outputP;
     }
-    
+    createFile("outputFile");
     firstMove(inputP);
     icPointer = getICPointer();
     printTable();
     updateSymbolTableRefrences(icPointer);
     printf("\nUpdated Table\n\n");
     printTable();
-    if(inputP != NULL)
-		fclose(inputP);
-	inputP = fopen(argv[1],"r");
-    /*  rewind(inputP); */
-    secondMove(inputP, "outputFile");
+
+    rewind(inputP);
+    secondMove(inputP);
     printCodeCollection();
 
+    closeFiles();
 	if(inputP != NULL)
 		fclose(inputP);
 	if(outputP != NULL)

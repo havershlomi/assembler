@@ -46,16 +46,39 @@ void completionTo2(const int a) {
     int2bin(b);
 }
 
+void cutByBits(const int number, int from, int to){
+    int i = 0, copy = number,oneIndex;
+    int rangeSize = to - from;
+    char bitSign = '0';
+    int2bin(copy);
+
+    for ( i = 0; i < 15; i++) {
+        if(i < from){
+            copy >>= 1;
+        } else if(rangeSize > 0){
+            rangeSize--;
+            bitSign = (b & 1) +'0';
+        } else {
+            if(bitSign == '1'){
+                
+                break;
+            } else {
+                b >>= 1;
+            }
+        }
+
+        
+    }
+    int2bin(copy);
+    
+}
+
 int main(){
 
-    Word* shlomi;
-     shlomi =  (Word*)malloc(15);
-
-        shlomi -> data.cell = -333;
-    
-        printf("Test: %d",shlomi -> data.cell);
-        completionTo2(14);
-        completionTo2(13);
+cutByBits(22,2,4);
+cutByBits(256,3,4);
+    completionTo2(2);
+    completionTo2(13);
 
     return 0;
 }

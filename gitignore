@@ -10,6 +10,9 @@
 *.ko
 *.obj
 *.elf
+*.ext
+*.ent
+*.ob
 
 # Precompiled Headers
 *.gch
@@ -299,5 +302,6 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
 
 .vscode/

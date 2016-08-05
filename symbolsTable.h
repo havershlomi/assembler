@@ -6,6 +6,8 @@ return true if succeeded false otherwise*/
 int tryAddSymbol(Symbol* symbol);
 /*find symbol refrence number in the table using his name*/
 int getSymbolRefrenceByName(char* symbolName);
+/*find symbol in the table using his name*/
+Symbol* getSymbolByName(char* symbolName);
 /*clear all the allocations the table made and reset table*/
 void disposeSymbolsTable();
 Symbol* createSymbol(char *label, int refrence, int commandType, int isExternal);

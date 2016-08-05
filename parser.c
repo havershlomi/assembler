@@ -91,7 +91,7 @@ void firstMove(FILE* input){
             } else if((hasLabel == true && sscanf(str,"%*[^ \r\t:]%*[:] %[^ \r\t\n:] %[^\n] ",action, actionAttr) >= 1)
                 || (hasLabel == false && sscanf(str," %[^ \r\t\n:] %[^\n] ",action,actionAttr) >= 1)){
                 /*handle action*/
-                icPointer  = getActionBlockAddressType(action,actionAttr);
+                icPointer  = getActionAddressingType(action,actionAttr);
                 printf("%s|%d,%s\n",label,icPointer,actionAttr);
                 
                 if(hasLabel == true && icPointer != INVALID){
@@ -110,15 +110,12 @@ void firstMove(FILE* input){
 }
 
 
-void secondMove(FILE* input, const char* fileName){
+void secondMove(FILE* input){
     int instructionType = -1,  refrencePointer = -1;
     int hasLabel = false;
     char label[30] = "", dataType[LINE_LENGTH] = "", action[4] = "",actionAttr[LINE_LENGTH] = "";
     char labelDelimeter;
 	char str[LINE_LENGTH] = "", dataStr[LINE_LENGTH] = "";
-    char entryFileName[MAX_FILE_NAME] = ""; 
-    
-    sprintf(entryFileName, "%s.%s",fileName,"ent");
 
     resetIc();
     while(fgets(str,LINE_LENGTH,input) != NULL){
@@ -128,12 +125,10 @@ void secondMove(FILE* input, const char* fileName){
 
         if(str[0] != ';')
         {
-            
             /*try to find label*/
             if(sscanf(str,"%[^ \r\t:]%[:]",label,&labelDelimeter) == 2){
                 if(!isspace(str[0])  && isValidLabel(label) == true){
                     hasLabel = true; 
-                    
                 } else {
                     printErr("label '%s' is invalid\n",label);
                 }
@@ -153,13 +148,12 @@ void secondMove(FILE* input, const char* fileName){
                         {
                             printErr("Symbol: %s was not found in the symbol table\n",dataStr);
                         } else {
-                            fileWrite(entryFileName,"%s %d\n",dataStr,refrencePointer);
+                            entryWriteToFile("%s %d\n",dataStr,refrencePointer);
                         }
                     }
                     else
                     {
                         printErr("illegal symbol for .entry instruction \n");
-                    
                     }
                 } 
 
@@ -167,7 +161,6 @@ void secondMove(FILE* input, const char* fileName){
                 || (hasLabel == false && sscanf(str," %[^ \r\t\n:] %[^\n] ",action,actionAttr) >= 1)){
                 
                 /*handle action*/
-                
                 addActionToCodeCollection(action,actionAttr);
             
             } else if(sscanf(str," %[^ \t\r\n] ",dataStr) == 1){
@@ -195,7 +188,7 @@ int isValidLabel(char *label){
 
 
 
-int getActionBlockAddressType(char *action,char *actionAttr){
+int getActionAddressingType(char *action,char *actionAttr){
     Action *selectedAction;
     char firstOper[LINE_LENGTH] = "", secondOper[LINE_LENGTH] = "", extraData[LINE_LENGTH] = "";
     int blockAddressSourceType = -1, blockAddressDestType = -1;
@@ -212,8 +205,8 @@ int getActionBlockAddressType(char *action,char *actionAttr){
                     blockAddressSourceType = getOperandType(firstOper);
                     blockAddressDestType = getOperandType(secondOper);
 
-                    if(isValidBlockAddressTypeForAction(blockAddressSourceType,selectedAction -> sourceOper) == true
-                        && isValidBlockAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == true){
+                    if(isValidAddressTypeForAction(blockAddressSourceType,selectedAction -> sourceOper) == true
+                        && isValidAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == true){
                         return getActionRefrenceinMemory(blockAddressSourceType, blockAddressDestType); 
                     } else {
                         printErr("invalid block address method for action '%s'\n'",action);                
@@ -225,7 +218,7 @@ int getActionBlockAddressType(char *action,char *actionAttr){
             /*handle action with 1 operands*/
         } else if(selectedAction -> numOfOperands == 1){
             blockAddressDestType = getOperandType(actionAttr);
-            if(isValidBlockAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == false){
+            if(isValidAddressTypeForAction(blockAddressDestType,selectedAction -> destOper) == false){
                 printErr("invalid block address method for action '%s' \n'",action);
             } else {
                 return getActionRefrenceinMemory(notUsedOper, blockAddressDestType);
