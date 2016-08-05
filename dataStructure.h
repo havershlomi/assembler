@@ -40,7 +40,7 @@ typedef union word {
         int src:6;
         int dest:6;
         unsigned int notUsed:1;
-    } refisterValue;
+    } registerValue;
     /*Value |VALUE|ERA|*/
     struct {
         unsigned int ERA:2;

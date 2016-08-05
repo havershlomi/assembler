@@ -20,4 +20,7 @@ void resetIc();
 void printCodeCollection();
 
 WordDef* createCommandWord(int opCode, int group, int src, int dest, int Era);
+WordDef* getRegisterWord(int srcAdressType, char* srcWord, int destAdressType, char* destWord);
+WordDef* getInstantWord(char* value);
+void addDataWordToCollection(int addressingType, char* value);
 void addToCollection(WordDef * wordDef, int wordType);

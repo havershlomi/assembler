@@ -8,6 +8,8 @@ shlomi: mov r4, r4
 .extern L
 
 goodData: .data 2,3,4,5
+    .data 4,5,6
+e: .data 3
 why: jsr r2
 why: stop 
 
