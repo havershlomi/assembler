@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
         {
             if((inputP = fopen(argv[currentFileIndex],"r")) == NULL)
             {
-                printErr("Invalid input file %s\n",fileName);
+                printErr("can't read file '%s'\n",argv[currentFileIndex]);
             } 
             else 
             {

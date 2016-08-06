@@ -527,20 +527,25 @@ void printCodeCollection(){
     Word *word;
     WordDef * base8;
     int i = 0, wordAsInt = 0;
-    char *output, *addressOutput;
+    char *output = "", *addressOutput = "";
     
     for(i = 0; i < ic; i++)
     {
         word = &codeCollection[i];
         if(word != NULL && word -> word != NULL){
-            if(word -> wordType == commandType){
+            if(word -> wordType == commandType)
+            {
                 wordAsInt = convertCommandWordToInt(word -> word);
-            }  else if(word -> wordType == registerValueType){
-                wordAsInt = convertRegisterValueWordToInt(word -> word);
-                
-            }  else if(word -> wordType == regularValueType){
+            }
+            else if(word -> wordType == registerValueType)
+            {
+                wordAsInt = convertRegisterValueWordToInt(word -> word);    
+            } 
+            else if(word -> wordType == regularValueType)
+            {
                 wordAsInt = convertRegularValueWordToInt(word -> word);
             }
+
             base8  = convertDecimalNumberToBase8Word(wordAsInt);
             output = getStringFromBase8Word(base8);
             addressOutput = getSpecialBase8String(i+IC_START_POSITION);

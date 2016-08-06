@@ -73,6 +73,7 @@ char* getStringFromBase8Word(WordDef * base8)
         output[2] = specialOctalBase[base8 -> Base8.block3];
         output[1] = specialOctalBase[base8 -> Base8.block4];
         output[0] = specialOctalBase[base8 -> Base8.block5];
+        output[5] = '\0';
     } 
     else 
     {
