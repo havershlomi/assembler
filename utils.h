@@ -32,3 +32,6 @@ int hasErrorInInput();
 /* set the error flag back to false */
 void resetErrorFlag();
 
+/*  gets a string 
+return the string without the white spaces from the end abd beginning */
+char *trimWhiteSpace(char *str);

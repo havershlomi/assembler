@@ -26,11 +26,11 @@ int calculateActionIcPointer(char *action,char *actionAttr)
         if(selectedAction -> numOfOperands == 2)
         {
             /* get the operands */            
-            if(sscanf(actionAttr," %[^ \r\t:,] , %[^ \r\t:] %[^\n] ",firstOper,secondOper,extraData) >= 2)
+            if(sscanf(actionAttr," %[^ \r\t:,] , %[^ \r\t:,] %[^\n] ",firstOper,secondOper,extraData) >= 2)
             {
                 if(strlen(extraData) != 0)
                 {
-                    printErr("%s can not get more than 2 operands\n",action);
+                    printErr("'%s' can not get more than 2 operands\n",action);
                 } 
                 else
                 {
@@ -54,7 +54,7 @@ int calculateActionIcPointer(char *action,char *actionAttr)
             } 
             else 
             {
-                printErr("%s except to get 2 operands\n",action);                
+                printErr("%s expect to get 2 operands\n",action);                
             }
         } 
         else if(selectedAction -> numOfOperands == 1)
@@ -92,7 +92,7 @@ int calculateActionIcPointer(char *action,char *actionAttr)
     }
     else 
     {
-        printErr("'%s' is an invalidaction name\n",action);
+        printErr("'%s' is an invalid action name\n",action);
     }
 
     return icPointer;
@@ -129,13 +129,9 @@ void addActionToCodeCollection(char *action,char *actionAttr){
         if(selectedAction -> numOfOperands == 2)
         {
             /* get the operands */
-            if(sscanf(actionAttr," %[^ \r\t:,] , %[^ \r\t:] %[^\n] ",firstOper,secondOper,extraData) >= 2)
+            if(sscanf(actionAttr," %[^ \r\t:,] , %[^ \r\t:,] %[^\n] ",firstOper,secondOper,extraData) >= 2)
             {
-                if(strlen(extraData) != 0)
-                {
-                    printErr("%s can not get more than 2 operands\n",action);
-                } 
-                else 
+                if(strlen(extraData) == 0) 
                 {
                     srcAddressingType = getOperandType(firstOper);                    
                     destAddressingType = getOperandType(secondOper);
@@ -144,6 +140,9 @@ void addActionToCodeCollection(char *action,char *actionAttr){
                     if(isValidAddressTypeForAction(srcAddressingType,selectedAction -> sourceOper) == true
                         && isValidAddressTypeForAction(destAddressingType,selectedAction -> destOper) == true)
                     {
+                        if(srcAddressingType != directRegister)
+                            addDataWordToCollection(srcAddressingType, firstOper);
+
                         /* if one of the operands is a register type add it to the collection */    
                         if((srcAddressingType == directRegister && destAddressingType == directRegister) || 
                             (srcAddressingType == directRegister || destAddressingType == directRegister))
@@ -152,15 +151,10 @@ void addActionToCodeCollection(char *action,char *actionAttr){
                             addToCollection(wordDef, registerValueType);
                         }
 
-                        /* add these operands if they are not register type */
-                        addDataWordToCollection(srcAddressingType, firstOper);
-                        addDataWordToCollection(destAddressingType, secondOper); 
+                        if(destAddressingType != directRegister)
+                            addDataWordToCollection(destAddressingType, secondOper);
                     }
                 }
-            } 
-            else 
-            {
-                printErr("%s except to get 2 operands\n",action);                
             }
         } 
         else if(selectedAction -> numOfOperands == 1)
@@ -229,11 +223,7 @@ void addDataWordToCollection(int addressingType, char* value)
     char *lineNumber;
 
     /* find the right word type and create a word object */
-    if(addressingType == directRegister)
-    {
-        return;
-    }
-    else if(addressingType == instant)
+    if(addressingType == instant)
     {
         wordDef = createInstantWord(value);
         dataType = regularValueType;
@@ -544,16 +534,16 @@ void printCodeCollection(){
         word = &codeCollection[i];
         if(word != NULL && word -> word != NULL){
             if(word -> wordType == commandType){
-                /*printf("%d|%d|%d|%d|%d|%d\n",word -> word -> command.notUsed,word -> word -> command.group,word -> word -> command.opCode,
-                word -> word -> command.src,word -> word -> command.dest,word -> word -> command.ERA);*/
+                printf("%d|%d|%d|%d|%d|%d\n",word -> word -> command.notUsed,word -> word -> command.group,word -> word -> command.opCode,
+                word -> word -> command.src,word -> word -> command.dest,word -> word -> command.ERA);
                 wordAsInt = convertCommandWordToInt(word -> word);
             }  else if(word -> wordType == registerValueType){
-                /*printf(" %d | %d | %d | %d \n",word -> word -> registerValue.notUsed, word -> word -> registerValue.src,
-                word -> word -> registerValue.dest,word -> word -> registerValue.ERA);*/
+                printf(" %d | %d | %d | %d \n",word -> word -> registerValue.notUsed, word -> word -> registerValue.src,
+                word -> word -> registerValue.dest,word -> word -> registerValue.ERA);
                 wordAsInt = convertRegisterValueWordToInt(word -> word);
                 
             }  else if(word -> wordType == regularValueType){
-                /*printf(" %d | %d \n",word -> word -> regularValue.value, word -> word -> regularValue.ERA);*/
+                printf(" %d | %d \n",word -> word -> regularValue.value, word -> word -> regularValue.ERA);
                 wordAsInt = convertRegularValueWordToInt(word -> word);
             }
             base8  = convertDecimalNumberToBase8Word(wordAsInt);

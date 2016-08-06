@@ -48,6 +48,7 @@ int main(int argc, char* argv[])
                     /* print the output to the .ob file */
                     printCodeCollection();
                     printDataCollection(icPointer);
+                    printTable();
                 } 
                 else 
                 {
@@ -66,8 +67,7 @@ int main(int argc, char* argv[])
         } 
         else 
         {
-            printErr("invalid file name for assembler%s,%s\n",fileName,suffix);
-            
+            printf("invalid file name for assembler '%s'\n",fileName);
         }
         currentFileIndex++;
     }

@@ -4,12 +4,15 @@
 
 Symbol* createSymbol(char *label, int refrence, int commandType, int isExternal)
 {
+    char  *trimmedLabel;
     Symbol* symbol;
     symbol = (Symbol*)malloc(sizeof(Symbol));
 
+    trimmedLabel = trimWhiteSpace(label);
+
     if(symbol)
     {
-        memcpy(symbol -> name,label,LABAL_MAX_LENGTH);
+        memcpy(symbol -> name, trimmedLabel, LABAL_MAX_LENGTH);
         symbol -> isExternal = isExternal;
         symbol -> icRefrence = refrence;
         symbol -> commandType = commandType;
@@ -78,6 +81,7 @@ int tryAddSymbol(Symbol* symbol)
 Symbol* getSymbolByName(char* symbolName){
     SymbolNode *symbolPtr;
     
+    symbolName = trimWhiteSpace(symbolName);
     if(symbolTable != NULL)
     {
         /*find the symbol in the list*/
