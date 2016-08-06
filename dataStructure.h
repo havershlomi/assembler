@@ -1,6 +1,7 @@
 #define NOT_USED_DEFAULT_VALUE 5 
 #define LABAL_MAX_LENGTH 30 
 
+/* symbol struct */
 typedef struct symbol {
     char name[LABAL_MAX_LENGTH];
     int icRefrence;
@@ -9,6 +10,7 @@ typedef struct symbol {
     int dcRefrence;
 } Symbol;
 
+/* symbol node */
 typedef struct symbolNode {
     Symbol value; 
     struct symbolNode* next;
@@ -16,6 +18,7 @@ typedef struct symbolNode {
 
 SymbolNode *symbolTable;
 
+/* action definition */
 typedef struct action {
     char *name;
 	int binaryIndex;
@@ -23,6 +26,7 @@ typedef struct action {
     int destOper[4];
     unsigned int numOfOperands;
 } Action;
+
 
 typedef union word {
     /*Binary command |notUsed|Group|opCode|SRC|DEST|ERA|*/
@@ -56,6 +60,7 @@ typedef union word {
     } Base8;
 } WordDef;
 
+/* word for code collections */
 typedef struct{
     WordDef *word;
     int wordType;

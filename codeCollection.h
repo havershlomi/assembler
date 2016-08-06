@@ -74,3 +74,6 @@ void resetIc();
 
 /* remove all the words from the data collection */
 void cleanCodeCollection();
+
+/* get the ic collection size */
+int getICCollectionSize();

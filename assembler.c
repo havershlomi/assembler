@@ -1,6 +1,5 @@
 #include "assembler.h" 
 
-
 int main(int argc, char* argv[])
 {
  	FILE * inputP;
@@ -32,6 +31,8 @@ int main(int argc, char* argv[])
 
                 /* get the ic pointer value after the first iteration */
                 icPointer = getICPointer();
+
+                printObjFileHeader();
 
                 /* update refrences according to the ic counter value */
                 updateSymbolTableRefrences(icPointer);
@@ -78,4 +79,23 @@ void cleanAllCollections()
     disposeSymbolsTable();
     clearData();
     cleanCodeCollection();
+}
+
+void printObjFileHeader()
+{
+    char *icNumber,*dcNumber;
+    int icCollectionSize, dcCollectionSize;
+
+    icCollectionSize = getICCollectionSize();
+    dcCollectionSize = getDCPointer();
+
+    objWriteToFile("Base 8 Special Address  |   Base 8 special code\n");
+
+    icNumber = getSpecialBase8String(icCollectionSize);
+    dcNumber = getSpecialBase8String(dcCollectionSize);
+    
+    objWriteToFile("%s  %s\n", icNumber, dcNumber);
+
+    free(icNumber);
+    free(dcNumber);
 }

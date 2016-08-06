@@ -200,7 +200,7 @@ int addStringInstructionToDC(char *dataStr){
     {
         return addStringData(instructionData);  
     } else {
-        printErr("invalid string\n");
+        printErr("invalid string was specified\n");
         return INVALID;
     }
 }
