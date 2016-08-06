@@ -4,6 +4,7 @@
 #include "dataCollection.h"
 #include "symbolsTable.h"
 #include "fileHandler.h"
+#include "binaryConvertor.h"
 
 
 char *illegalLabelNames[24]={
@@ -112,7 +113,7 @@ void secondIteration(FILE* input){
     int hasLabel = false;
     char label[30] = "", dataType[LINE_LENGTH] = "", action[4] = "",actionAttr[LINE_LENGTH] = "";
     char labelDelimeter;
-	char str[LINE_LENGTH] = "", dataStr[LINE_LENGTH] = "";
+	char str[LINE_LENGTH] = "", dataStr[LINE_LENGTH] = "",*lineNumber;
 
     resetIc();
     while(fgets(str,LINE_LENGTH,input) != NULL){
@@ -145,7 +146,9 @@ void secondIteration(FILE* input){
                         {
                             printErr("Symbol: %s was not found in the symbol table\n",dataStr);
                         } else {
-                            entryWriteToFile("%s %d\n",dataStr,refrencePointer);
+                            lineNumber = getSpecialBase8String(refrencePointer);
+                            entryWriteToFile("%s %s\n",dataStr,lineNumber);
+                            free(lineNumber);
                         }
                     }
                     else

@@ -1,4 +1,8 @@
 #include "dataCollection.h"
+#include "dataStructure.h"
+#include "fileHandler.h"
+#include "binaryConvertor.h"
+#include "utils.h"
 
 /* dc counter */
 static int dc = 0;
@@ -40,4 +44,24 @@ void clearData(){
 
 int getDCPointer(){
     return dc;
+}
+
+void printDataCollection(int icRefrence){
+    int i = 0, lineRefrence;
+    char *lineNumber, *dataOutput;
+    WordDef * base8;
+
+    for(i = 0;i < dc; i++){
+        lineRefrence = i + icRefrence;
+        lineNumber = getSpecialBase8String(lineRefrence);
+        base8 = convertDecimalToBase8(dataCollection[i]);
+        dataOutput = getBase8String(base8);
+        
+        printf("%s  %s\n",lineNumber,dataOutput);
+        objWriteToFile("%s  %s\n", lineNumber, dataOutput);
+
+        free(lineNumber);
+        free(base8);
+        free(dataOutput);
+    }    
 }

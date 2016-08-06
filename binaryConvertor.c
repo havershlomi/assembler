@@ -35,7 +35,7 @@ unsigned int convertRegularValueWordToInt(WordDef *wordDef){
     return result;
 }
 
-WordDef * convertToBase8( int number){
+WordDef * convertDecimalToBase8( int number){
     WordDef * base8 = (WordDef*)malloc(sizeof(WordDef));
 
     if(base8){
@@ -65,7 +65,7 @@ char* getBase8String(WordDef * base8){
     return output;
 }
 
-char* getSpecialBase8String( int decimalNumber){
+char* getSpecialBase8String(int decimalNumber){
     int octalNumber[WORD_SIZE],i = 1 , j, index = 0;
     long int quotient;
     char *output = (char *)malloc(WORD_SIZE);
@@ -77,10 +77,11 @@ char* getSpecialBase8String( int decimalNumber){
             octalNumber[i++] = quotient % 8;
             quotient = quotient / 8;
         }
-
+      
         for(j = i -1 ;j > 0;j--){
             output[index++] = (char)specialOctalBase[octalNumber[j]]; 
         }
+        output[index++] = '\0';
     } else {
         printErr("can't allocate space for output\n");
     }

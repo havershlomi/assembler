@@ -6,3 +6,4 @@ int addNumbersData(int* data, int arrayLength);
 int getDataByID(int refrenceID);
 void clearData();
 int getDCPointer();
+void printDataCollection(int icRefrence);

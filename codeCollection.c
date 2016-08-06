@@ -181,6 +181,7 @@ WordDef* createCommandWord(int opCode, int group, int src, int dest, int Era){
 void addDataWordToCollection(int addressingType, char* value){
     WordDef * wordDef;
     int addedAtRow = -1, dataType = -1;
+    char *lineNumber;
     if(addressingType == directRegister){
         return;
     }
@@ -198,7 +199,9 @@ void addDataWordToCollection(int addressingType, char* value){
     if(wordDef){
         addedAtRow = addToCollection(wordDef, dataType);
         if(wordDef -> regularValue.ERA == externalData){
-            externalWriteToFile("%s %d\n",value,addedAtRow);
+            lineNumber = getSpecialBase8String(addedAtRow);
+            externalWriteToFile("%s %s\n",value,lineNumber);
+            free(lineNumber);
         }
     }
 }
@@ -432,13 +435,14 @@ void printCodeCollection(){
                 /*printf(" %d | %d \n",word -> word -> regularValue.value, word -> word -> regularValue.ERA);*/
                 wordAsInt = convertRegularValueWordToInt(word -> word);
             }
-            base8  = convertToBase8(wordAsInt);
+            base8  = convertDecimalToBase8(wordAsInt);
             output = getBase8String(base8);
             addressOutput = getSpecialBase8String(i+IC_START_POSITION);
 
             printf("%s  %s\n",addressOutput,output);
             objWriteToFile("%s  %s\n",addressOutput,output);
 
+            free(base8);
             free(output);
             free(addressOutput);
         }
