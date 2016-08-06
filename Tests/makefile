@@ -1,5 +1,5 @@
-parserTest : parserTest.c utils.o  sharedCollections.o parser.o codeCollection.o dataCollection.o symbolsTable.o dataStructure.o fileHandler.o 
-	gcc -g -ansi -Wall -pedantic parserTest.c utils.o  sharedCollections.o parser.o codeCollection.o dataCollection.o symbolsTable.o dataStructure.o fileHandler.o -o parserTest
+parserTest : parserTest.c utils.o  sharedCollections.o parser.o codeCollection.o dataCollection.o symbolsTable.o dataStructure.o fileHandler.o binaryConvertor.o 
+	gcc -g -ansi -Wall -pedantic parserTest.c utils.o  sharedCollections.o parser.o codeCollection.o dataCollection.o symbolsTable.o dataStructure.o fileHandler.o binaryConvertor.o -o parserTest
 binaryTest : binaryTest.c utils.o dataStructure.o
 	gcc -g -ansi -Wall -pedantic binaryTest.c utils.o dataStructure.o -o binaryTest
 parser.o : ../parser.c 
@@ -15,6 +15,9 @@ fileHandler.o : ../fileHandler.c
 
 sharedCollections.o : ../sharedCollections.c
 	gcc -c -ansi -Wall -pedantic ../sharedCollections.c -o sharedCollections.o
+
+binaryConvertor.o : ../binaryConvertor.c
+	gcc -c -ansi -Wall -pedantic ../binaryConvertor.c -o binaryConvertor.o
 
 symbolsTableTest : symbolsTableTest.c symbolsTable.o utils.o
 	gcc -g -ansi -Wall -pedantic symbolsTableTest.c symbolsTable.o utils.o -o symbolsTableTest

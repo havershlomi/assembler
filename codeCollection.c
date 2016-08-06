@@ -1,11 +1,11 @@
 #include "codeCollection.h"
 #include "dataCollection.h"
+#include "binaryConvertor.h"
 #include "utils.h"
 
 extern Action ValidActions[];
 static int ic = 0;
 static Word codeCollection[1000];
- 
 int getActionAddressingType(char *action,char *actionAttr){
     Action *selectedAction;
     char firstOper[LINE_LENGTH] = "", secondOper[LINE_LENGTH] = "", extraData[LINE_LENGTH] = "";
@@ -403,9 +403,12 @@ void resetIc(){
 
 void printCodeCollection(){
     Word *word;
-    int i = 0;
+    WordDef * base8;
+    int i = 0, wordAsInt = 0;
+    char *output, *addressOutput;
     
-    printf("|notUsed|Group|opCode|SRC|DEST|ERA|\n");
+    objWriteToFile("Base 8 Special Address  |   Base 8 special code\n");
+    objWriteToFile("print the size of both collection here\n");
     for(i = 0; i < ic; i++)
     {
         word = &codeCollection[i];
@@ -413,45 +416,25 @@ void printCodeCollection(){
             if(word -> wordType == commandType){
                 /*printf("%d|%d|%d|%d|%d|%d\n",word -> word -> command.notUsed,word -> word -> command.group,word -> word -> command.opCode,
                 word -> word -> command.src,word -> word -> command.dest,word -> word -> command.ERA);*/
-                int2bin(convertCommandWordToInt(word -> word));
+                wordAsInt = convertCommandWordToInt(word -> word);
             }  else if(word -> wordType == registerValueType){
-            /*    printf(" %d | %d | %d | %d \n",word -> word -> registerValue.notUsed, word -> word -> registerValue.src,
+                /*printf(" %d | %d | %d | %d \n",word -> word -> registerValue.notUsed, word -> word -> registerValue.src,
                 word -> word -> registerValue.dest,word -> word -> registerValue.ERA);*/
-                int2bin(convertRegisterValueWordToInt(word -> word));
+                wordAsInt = convertRegisterValueWordToInt(word -> word);
                 
             }  else if(word -> wordType == regularValueType){
                 /*printf(" %d | %d \n",word -> word -> regularValue.value, word -> word -> regularValue.ERA);*/
-                int2bin(convertRegularValueWordToInt(word -> word));
-                
+                wordAsInt = convertRegularValueWordToInt(word -> word);
             }
-            printf("\n");
+            base8  = convertToBase8(wordAsInt);
+            output = getBase8String(base8);
+            addressOutput = getSpecialBase8String(i+IC_START_POSITION);
+
+            printf("%s  %s\n",addressOutput,output);
+            objWriteToFile("%s  %s\n",addressOutput,output);
+            
+            free(output);
+            free(addressOutput);
         }
     }
-    
-}
-unsigned int convertCommandWordToInt(WordDef *wordDef){
-    int result = 0;
-    result = result | (wordDef -> command.ERA);
-    result = result | (wordDef -> command.dest << 2);
-    result = result | (wordDef -> command.src << 4);
-    result = result | (wordDef -> command.opCode << 6);
-    result = result | (wordDef -> command.group << 10);
-    result = result | (wordDef -> command.notUsed << 12);
-
-    return result;
-}
-unsigned int convertRegisterValueWordToInt(WordDef *wordDef){
-    int result = 0;
-    result = result | (wordDef -> registerValue.ERA);
-    result = result | (wordDef -> registerValue.dest << 2);
-    result = result | (wordDef -> registerValue.src << 8);
-    result = result | (wordDef -> registerValue.notUsed << 14);
-    
-    return result;
-}
-unsigned int convertRegularValueWordToInt(WordDef *wordDef){
-    int result = 0;
-    result = result | (wordDef -> regularValue.ERA);
-    result = result | (wordDef -> regularValue.value << 2);
-    return result;
 }

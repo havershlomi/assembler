@@ -33,15 +33,15 @@ int main(int argc, char* argv[])
         stdout = outputP;
     }
     createFile("outputFile");
-    firstMove(inputP);
+    firstIteration(inputP);
     icPointer = getICPointer();
     printTable();
     updateSymbolTableRefrences(icPointer);
-    printf("\nUpdated Table\n\n");
+    
     printTable();
 
     rewind(inputP);
-    secondMove(inputP);
+    secondIteration(inputP);
     printCodeCollection();
 
     closeFiles();

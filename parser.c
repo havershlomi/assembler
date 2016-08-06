@@ -26,7 +26,7 @@ int getInstructionType(const char* instruction){
         return invalidInstruction;
 }
 
-void firstMove(FILE* input){
+void firstIteration(FILE* input){
     int instructionType = -1, dcPointer = -1, isExternal = false, commandType = none, icPointer = -1;
     int hasLabel = false;
     char label[30] = "", dataType[LINE_LENGTH] = "", action[4] = "",actionAttr[LINE_LENGTH] = "",*labelPtr;
@@ -107,7 +107,7 @@ void firstMove(FILE* input){
 }
 
 
-void secondMove(FILE* input){
+void secondIteration(FILE* input){
     int instructionType = -1,  refrencePointer = -1;
     int hasLabel = false;
     char label[30] = "", dataType[LINE_LENGTH] = "", action[4] = "",actionAttr[LINE_LENGTH] = "";

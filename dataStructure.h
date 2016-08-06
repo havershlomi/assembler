@@ -23,7 +23,6 @@ typedef struct action {
 } Action;
 
 typedef union word {
-    unsigned int cell:15;
     /*Binary command |notUsed|Group|opCode|SRC|DEST|ERA|*/
     struct {
         unsigned int ERA:2;

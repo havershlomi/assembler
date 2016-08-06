@@ -44,3 +44,16 @@ int main(){
 
     return 0;
 }
+
+
+void int2bin(const int a) {
+    int b = 0;
+int i = 0;
+printf("\n");
+    b = a;
+    for ( i = 0; i < 15; i++) {
+        printf("%c",(b & 1) +'0');
+
+        b >>= 1;
+    }
+}

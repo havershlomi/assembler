@@ -1,5 +1,5 @@
 #include "dataStructure.h"
-
+/*  */
 Action ValidActions[] = {
     {"mov",0,{0,1,2,3},{1,3,-1,-1},2},
     {"cmp",1,{0,1,2,3},{0,1,2,3},2},

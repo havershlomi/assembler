@@ -10,7 +10,9 @@ int getSymbolRefrenceByName(char* symbolName);
 Symbol* getSymbolByName(char* symbolName);
 /*clear all the allocations the table made and reset table*/
 void disposeSymbolsTable();
+/* get the properties of symbol and return a symbol object */
 Symbol* createSymbol(char *label, int refrence, int commandType, int isExternal);
+/* after  the first iteration update the ic counter of all the data */
 void updateSymbolTableRefrences(int icPointer);
-
+/* print the table  */
 void printTable();
