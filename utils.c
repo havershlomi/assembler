@@ -1,15 +1,23 @@
 #include "utils.h"
 
-void printErr(char * format,...){
-    va_list arg;    
+static int hasError = false;
 
+void printErr(char * format,...)
+{
+    va_list arg;
+    hasError = true;
     va_start (arg, format);
     vfprintf (stderr, format, arg);
-    /*done = vfprintf (stdout, format, arg);*/
     va_end (arg); 
 }
 
-int cutByBits(const int number, int from, int to){
+int hasErrorInInput()
+{
+    return hasError;
+}
+
+int cutByBits(const int number, int from, int to)
+{
     int i = 0, result = number, rangeSize = to - from;
     char bitSign = '0';
 
@@ -19,7 +27,8 @@ int cutByBits(const int number, int from, int to){
     bitSign = ((result >> rangeSize) & 1) +'0';
     
     /*flips all the other bits to 1 or 0 depends on bitSign*/
-    for (i = rangeSize ; i < 15; i++) {
+    for (i = rangeSize ; i < 15; i++) 
+    {
         if(bitSign == '1')
             result = result | 1 << i ;
         else
@@ -29,3 +38,7 @@ int cutByBits(const int number, int from, int to){
     return result;
 }
 
+void resetErrorFlag()
+{
+    hasError =  false;
+}

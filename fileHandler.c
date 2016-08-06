@@ -1,13 +1,19 @@
 #include "utils.h"
 #include "fileHandler.h"
 
+/* out put static file names */
 static char entryFileName[MAX_FILE_NAME] = "", externalFileName[MAX_FILE_NAME] = "", objectlFileName[MAX_FILE_NAME] = "";
+/* output file pointers */
 static FILE  *entryFile, *externalFile, *objFile;
-void createFile(const char* fileName){    
+
+void createFile(const char* fileName)
+{
+    /* generate file names */    
     sprintf(entryFileName, "%s.%s",fileName,"ent");
     sprintf(externalFileName, "%s.%s",fileName,"ext");
     sprintf(objectlFileName, "%s.%s",fileName,"ob");
 
+    /* create all the files in write mode */
     if((externalFile = fopen(externalFileName,"w")) == NULL){
         printErr("can not create %s output file",externalFileName);
     }
@@ -22,7 +28,8 @@ void createFile(const char* fileName){
 
 }
 
-void entryWriteToFile(char * format,...){
+void entryWriteToFile(char * format,...)
+{
     va_list arg;
     if(entryFile){
         va_start(arg, format);
@@ -30,7 +37,9 @@ void entryWriteToFile(char * format,...){
         va_end(arg); 
     }
 }
-void objWriteToFile(char * format,...){
+
+void objWriteToFile(char * format,...)
+{
     va_list arg;
     
     if(objFile){
@@ -39,7 +48,9 @@ void objWriteToFile(char * format,...){
         va_end(arg); 
     }
 }
-void externalWriteToFile(char * format,...){
+
+void externalWriteToFile(char * format,...)
+{
     va_list arg;
     
     if(externalFile){
@@ -49,7 +60,8 @@ void externalWriteToFile(char * format,...){
     }
 }
 
-void closeFiles(){
+void closeFiles()
+{
     if(externalFile)
 		fclose(externalFile);
 	if(entryFile)
@@ -58,6 +70,20 @@ void closeFiles(){
 		fclose(objFile);
 }
 
-void deleteFile(){
+void deleteFiles()
+{
+    int removeStatus = -1;
+    removeStatus = remove(externalFileName);
+
+    if(removeStatus != 0)
+        printErr("Error: unable to delete this file: %s",externalFileName);
+
+    removeStatus = remove(entryFileName);
+    if(removeStatus != 0)
+        printErr("Error: unable to delete this file: %s",entryFileName);
+        
+    removeStatus = remove(objectlFileName);
+    if(removeStatus != 0)
+        printErr("Error: unable to delete this file: %s",objectlFileName);
 }
  

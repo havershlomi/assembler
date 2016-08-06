@@ -1,8 +1,8 @@
 #include "assembler.h" 
 
+
 int main(int argc, char* argv[])
 {
-    /*int counter=0;*/
  	FILE * inputP;
     int icPointer = -1;
     int currentFileIndex = 1;
@@ -17,46 +17,64 @@ int main(int argc, char* argv[])
         
         if(sscanf(argv[currentFileIndex],"%[^.].%s",fileName,suffix) == 2)
         {
-            if((inputP = fopen(argv[currentFileIndex],"r")) == NULL){
+            if((inputP = fopen(argv[currentFileIndex],"r")) == NULL)
+            {
                 printErr("Invalid input file %s\n",fileName);
-            } else {
-
+            } 
+            else 
+            {
+                resetErrorFlag();
                 /* creeate output files */
                 createFile(fileName);
+
                 /* perfoem the first iteration */
                 firstIteration(inputP);
+
                 /* get the ic pointer value after the first iteration */
                 icPointer = getICPointer();
+
                 /* update refrences according to the ic counter value */
                 updateSymbolTableRefrences(icPointer);
+
                 /* rewind to the begining of the file */
                 rewind(inputP);
+
                 /* perfoem the second iteration */
                 secondIteration(inputP);
-                /* print the output to the .ob file */
-                printCodeCollection();
-                printDataCollection(icPointer);
 
+                if(hasErrorInInput() == false)
+                {
+                    /* print the output to the .ob file */
+                    printCodeCollection();
+                    printDataCollection(icPointer);
+                } 
+                else 
+                {
+                    deleteFiles();
+                }
+                    
                 /* clean all collections used by the assembler */
                 cleanAllCollections();
                 
                 /* close all files */
                 closeFiles();
+
                 if(inputP != NULL)
                     fclose(inputP);
             }
-        } else {
+        } 
+        else 
+        {
             printErr("invalid file name for assembler%s,%s\n",fileName,suffix);
             
         }
-
         currentFileIndex++;
     }
-    
     return 0;
 }
 
-void cleanAllCollections(){
+void cleanAllCollections()
+{
     disposeSymbolsTable();
     clearData();
     cleanCodeCollection();

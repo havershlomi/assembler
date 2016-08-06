@@ -5,4 +5,5 @@
 #include "symbolsTable.h"
 #include "fileHandler.h"
 
+/* clean all the assembler collections */
 void cleanAllCollections();

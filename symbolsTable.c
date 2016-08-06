@@ -2,18 +2,23 @@
 #include "symbolsTable.h"
 #include "utils.h"
 
-Symbol* createSymbol(char *label, int refrence, int commandType, int isExternal){
+Symbol* createSymbol(char *label, int refrence, int commandType, int isExternal)
+{
     Symbol* symbol;
     symbol = (Symbol*)malloc(sizeof(Symbol));
-    if(symbol){
-        memcpy(symbol -> name,label,30);
+
+    if(symbol)
+    {
+        memcpy(symbol -> name,label,LABAL_MAX_LENGTH);
         symbol -> isExternal = isExternal;
         symbol -> icRefrence = refrence;
         symbol -> commandType = commandType;
         symbol -> dcRefrence = refrence;
         return symbol;
-    } else {
-        printErr("can not allocate space to the new symbol\n");
+    } 
+    else 
+    {
+        printf("can not allocate space to the new symbol\n");
         return NULL;
     }
 }
@@ -35,12 +40,10 @@ int tryAddSymbol(Symbol* symbol)
             if(symbolPtr -> value.name != '\0' &&
                 strcmp(symbolPtr -> value.name, symbolName) == 0)
             {
-                printErr("symbol: ");
-                printErr(symbolName);
-                printErr(" is already defined\n");
+                printErr("symbol: '%s' is already defined\n", symbolName);
                 return false;               
             }
-            /*check that the symbol name is not used name (EX: r0, mov)*/
+    
             prevPtr = symbolPtr; 
             symbolPtr = symbolPtr -> next;
         }
@@ -48,9 +51,10 @@ int tryAddSymbol(Symbol* symbol)
     }
     
     newNode = (SymbolNode*)malloc(sizeof(SymbolNode));
+
     if(newNode)
     {
-        /*adsd the new symbol to the table*/
+        /*add the new symbol to the table*/
         newNode -> value = *symbol;
         newNode -> next = NULL;
         if(symbolTable == NULL)
@@ -64,12 +68,13 @@ int tryAddSymbol(Symbol* symbol)
     } 
     else
     {
-        printErr("can not allocate space to the new symbol\n");
+        printf("can not allocate space to the new symbol\n");
         return false;
     }
     
     return true;
 }
+
 Symbol* getSymbolByName(char* symbolName){
     SymbolNode *symbolPtr;
     
@@ -89,14 +94,18 @@ Symbol* getSymbolByName(char* symbolName){
     }
     return NULL;
 }
-int getSymbolRefrenceByName(char* symbolName){
+
+int getSymbolRefrenceByName(char* symbolName)
+{
     Symbol *symbolPtr = getSymbolByName(symbolName);
     if(symbolPtr != NULL)
         return symbolPtr -> icRefrence;
+
     return SYMBOL_NOT_FOUND;
 }
 
-void disposeSymbolsTable(){
+void disposeSymbolsTable()
+{
     SymbolNode *symbolPtr, *currentPtr;
     
     if(symbolTable != NULL)
@@ -112,7 +121,8 @@ void disposeSymbolsTable(){
     }
 }
 
-void updateSymbolTableRefrences(int icPointer){
+void updateSymbolTableRefrences(int icPointer)
+{
      SymbolNode *symbolNodePtr;
      Symbol currentSymbol;
     

@@ -9,4 +9,5 @@ datlab: mov r1,datlabe
 .entry ABD
 .entry datlab
 prn datlabe[5-12]
+AR: .string "s
 mov AR,r2

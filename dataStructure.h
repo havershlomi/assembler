@@ -1,6 +1,8 @@
 #define NOT_USED_DEFAULT_VALUE 5 
+#define LABAL_MAX_LENGTH 30 
+
 typedef struct symbol {
-    char name[30];
+    char name[LABAL_MAX_LENGTH];
     int icRefrence;
     int commandType;
     int isExternal;

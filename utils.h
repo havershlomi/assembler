@@ -5,9 +5,7 @@
 #include <ctype.h>
 
 
-
-#define LABAL_MAX_LENGTH 30
-#define KNRM  "\x1B[34m"
+#define ACTION_MAX_LENGTH 4
 #define INVALID -1
 #define LINE_LENGTH 80
 #define WORD_SIZE 15
@@ -24,7 +22,13 @@ enum ERA { absolute = 0, externalData = 1, relocatable = 2};
 
 /* prints all the errors to stderr */
 void printErr(char * format,...);
+
 /* gets a number and the number if bits to cut from it */
 int cutByBits(const int number, int from, int to);
 
+/* return a value indication if there was errors during the assembelr iterrations */
+int hasErrorInInput();
+
+/* set the error flag back to false */
+void resetErrorFlag();
 

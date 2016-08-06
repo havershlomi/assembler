@@ -6,12 +6,12 @@
 #include "fileHandler.h"
 #include "binaryConvertor.h"
 
-
+/* a list with reserved names */
 char *illegalLabelNames[24]={
     "r0","r1","r2","r3","r4","r5","r6","r7",
     "mov","cmp","add","sub","not","clr","lea","inc","dec","jmp","bne","red","prn","jsr","rts","stop"
 };
-
+/* the length of the list */
 const long ILLIEGAL_LABELS_LENGTH = (sizeof(illegalLabelNames)/(sizeof(char*)));
 
 int getInstructionType(const char* instruction){
@@ -30,13 +30,14 @@ int getInstructionType(const char* instruction){
 void firstIteration(FILE* input){
     int instructionType = -1, dcPointer = -1, isExternal = false, commandType = none, icPointer = -1;
     int hasLabel = false;
-    char label[30] = "", dataType[LINE_LENGTH] = "", action[4] = "",actionAttr[LINE_LENGTH] = "",*labelPtr;
+    char label[LABAL_MAX_LENGTH] = "", dataType[LINE_LENGTH] = "", action[ACTION_MAX_LENGTH] = ""
+    ,actionAttr[LINE_LENGTH] = "",*labelPtr;
     char labelDelimeter;
 	char str[LINE_LENGTH] = "", dataStr[LINE_LENGTH] = "";
     Symbol *symbol;
-        
+    
+    /* read each row */
     while(fgets(str,LINE_LENGTH,input) != NULL){
-        printf("new sentence:  %s\n",str);
         hasLabel = false;
         actionAttr[0] = '\0';
         
@@ -54,7 +55,7 @@ void firstIteration(FILE* input){
             /*check if instruction*/
             if((hasLabel == true && sscanf(str,"%*[^ \r\t:]%*[:] %*[.]%s %[^\n]",dataType,dataStr) == 2)
                 || (hasLabel == false && sscanf(str," %*[.]%s %[^\n]",dataType,dataStr) == 2)){
-                
+                /* find the instruction */
                 instructionType = getInstructionType(dataType);
                 if(instructionType == invalidInstruction){
                     printErr("invalid instruction was found\n");
@@ -81,23 +82,23 @@ void firstIteration(FILE* input){
                 } 
                 if((hasLabel == true && (instructionType == data || instructionType == string))
                     || (instructionType == external && isExternal == true)){
+                    /* add label to the symbol table */
                     symbol = createSymbol(labelPtr, dcPointer, commandType, isExternal);
-                    if(tryAddSymbol(symbol) == true){
-                        printf( "added : %s\n", symbol -> name);
+                    if(symbol == NULL || tryAddSymbol(symbol) == false){
+                        printf("there is a problem adding %s to the symbol table\n",symbol -> name);
                     }
                 }
             } else if((hasLabel == true && sscanf(str,"%*[^ \r\t:]%*[:] %[^ \r\t\n:] %[^\n] ",action, actionAttr) >= 1)
                 || (hasLabel == false && sscanf(str," %[^ \r\t\n:] %[^\n] ",action,actionAttr) >= 1)){
                 /*handle action*/
-                icPointer  = getActionAddressingType(action,actionAttr);
-                printf("%s|%d,%s\n",label,icPointer,actionAttr);
+                icPointer  = calculateActionIcPointer(action,actionAttr);
                 
                 if(hasLabel == true && icPointer != INVALID){
+                    /*  add the action to the symbol table */
                     symbol = createSymbol(label, icPointer, actionCommand, isExternal);
-
-                    if(tryAddSymbol(symbol) == true){
-                        printf( "added : %s\n", symbol -> name);
-                    }
+                    if(symbol == NULL || tryAddSymbol(symbol) == false){
+                        printf("there is a problem adding %s to the symbol table\n", symbol -> name);
+                    }                
                 }
             } else if(sscanf(str," %[^ \t\r\n] ",dataStr) == 1){
                 /*if not empty line */
@@ -111,13 +112,14 @@ void firstIteration(FILE* input){
 void secondIteration(FILE* input){
     int instructionType = -1,  refrencePointer = -1;
     int hasLabel = false;
-    char label[30] = "", dataType[LINE_LENGTH] = "", action[4] = "",actionAttr[LINE_LENGTH] = "";
+    char label[LABAL_MAX_LENGTH] = "", dataType[LINE_LENGTH] = "",
+     action[ACTION_MAX_LENGTH] = "",actionAttr[LINE_LENGTH] = "";
     char labelDelimeter;
 	char str[LINE_LENGTH] = "", dataStr[LINE_LENGTH] = "",*lineNumber;
-
+    /* start counting commands again */
     resetIc();
+    /* loop through each line again */
     while(fgets(str,LINE_LENGTH,input) != NULL){
-        printf("new sentence:  %s\n",str);
         hasLabel = false;
         actionAttr[0] = '\0';
 
@@ -135,11 +137,13 @@ void secondIteration(FILE* input){
             if((hasLabel == true && sscanf(str,"%*[^ \r\t:]%*[:] %*[.]%s %[^\n]",dataType,dataStr) == 2)
                 || (hasLabel == false && sscanf(str," %*[.]%s %[^\n]",dataType,dataStr) == 2)){
                 
+                /* find instruction type */
                 instructionType = getInstructionType(dataType);
                 if(instructionType == invalidInstruction){
                     printErr("invalid instruction was found\n");
                 }
                 else if(instructionType == entry){
+                    /* if entry label is valid write it to entry file */                    
                     if(isValidLabel(dataStr) == true){
                         refrencePointer = getSymbolRefrenceByName(dataStr);
                         if(refrencePointer == SYMBOL_NOT_FOUND)
@@ -174,6 +178,7 @@ void secondIteration(FILE* input){
 int isValidLabel(char *label){
     char validLabel[LINE_LENGTH] = "" ,extraData[LINE_LENGTH] = "";
     int i = 0;
+    /* try to get label check if valid and not part of the reserved words list */
     if(sscanf(label," %[^ \t\r] %s ",validLabel,extraData) == 1 &&
         !isdigit(label[0]) && isalpha(label[0]) && strlen(label) <= LABAL_MAX_LENGTH){
         for(i = 0; i < 24; i++){
@@ -186,19 +191,16 @@ int isValidLabel(char *label){
     return false;
 }
 
-
-
-
 /*gets the  string instruction and extract all the numbers and save them*/
 int addStringInstructionToDC(char *dataStr){
     char stringEnd[LINE_LENGTH], instructionData[LINE_LENGTH] = "";
     
-    /*get the string only if valid and put it in the data collection*/
+    /* get the string only if valid and put it in the data collection*/
     if(sscanf(dataStr,"\"%[^\"] %[\"]",instructionData, stringEnd) == 2)
     {
         return addStringData(instructionData);  
     } else {
-        printf("invalid string\n");
+        printErr("invalid string\n");
         return INVALID;
     }
 }
@@ -210,42 +212,65 @@ int addDataInstructionToDC(char *dataStr){
     int j = 0, i = 0, dataPosition = -1;
     int  startReadingNumber = false, finishReadingNumber = false, invalidData = false;
     numberPart = strtok(dataStr,numberDelimiter);
+
     j = 0;
+    /* loop over each part of the .data string */
     while(numberPart != NULL && invalidData == false){
+        /* reset this values */
         startReadingNumber = false;
         finishReadingNumber = false;
         numbers[j] = 0;
         numberFactor = 1;
+
         /*iterate over number string*/
-        for(i = 0;i < strlen(numberPart); i++){
-            if(isdigit(numberPart[i]) && finishReadingNumber == false){
+        for(i = 0;i < strlen(numberPart); i++)
+        {
+            /* check if valid digit */
+            if(isdigit(numberPart[i]) && finishReadingNumber == false)
+            {
                 startReadingNumber = true;                                
                 numbers[j] = numbers[j] * 10 + (numberPart[i]-'0');
-            } else if(startReadingNumber == true && isspace(numberPart[i])) {
+            }
+            else if(startReadingNumber == true && isspace(numberPart[i])) 
+            {
                 finishReadingNumber = true;
-            } else if(finishReadingNumber == true){
+            } 
+            else if(finishReadingNumber == true)
+            {
                 invalidData = true;
                 break;
             }
-            else if(numberPart[i] == '+' || numberPart[i] == '-') {
+            else if(numberPart[i] == '+' || numberPart[i] == '-') 
+            {
+                /* check if the number has special sign (+/-) */
                 startReadingNumber = true;
                 if(numberPart[i] == '-')
                     numberFactor = -1; 
             }
         }
-        if(startReadingNumber == false){
+
+        if(startReadingNumber == false)
+        {
             invalidData = true;
-        } else {
+        } 
+        else
+        {
             numbers[j] *= numberFactor;
             j++;     
         }
+        /* get the next part of the number */
         numberPart = strtok(NULL,numberDelimiter);
     }
-    if(invalidData == true){
+    
+    if(invalidData == true)
+    {
         printErr("invalid data\n");
         invalidData = false;
-    } else {                        
+    }
+    else
+    {                        
         dataPosition = addNumbersData(numbers,j);
     }
+    /* return the first position we enetered the .data numbers */
     return dataPosition;
 }
