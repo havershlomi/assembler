@@ -3,9 +3,15 @@
 #include "binaryConvertor.h"
 #include "utils.h"
 
+/* get this from the sharedCollections file*/
 extern Action ValidActions[];
+/* ic counter */
 static int ic = 0;
+/* code collection */
 static Word codeCollection[1000];
+/* an empty word to reset the array with */
+static const Word EmptyWord;
+
 int getActionAddressingType(char *action,char *actionAttr){
     Action *selectedAction;
     char firstOper[LINE_LENGTH] = "", secondOper[LINE_LENGTH] = "", extraData[LINE_LENGTH] = "";
@@ -432,9 +438,16 @@ void printCodeCollection(){
 
             printf("%s  %s\n",addressOutput,output);
             objWriteToFile("%s  %s\n",addressOutput,output);
-            
+
             free(output);
             free(addressOutput);
         }
     }
+}
+void cleanCodeCollection(){
+     int i = 0;
+    for(i = 0;i < ic; i++){
+        codeCollection[i] = EmptyWord;
+    }    
+    
 }

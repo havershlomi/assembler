@@ -1,7 +1,9 @@
 #include "dataCollection.h"
-static int dc = 0;
-int dataCollection[1000];
 
+/* dc counter */
+static int dc = 0;
+/* data collection */
+int dataCollection[1000];
 
 int addStringData(char* data)
 {

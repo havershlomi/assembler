@@ -17,9 +17,9 @@ int addActionToCodeCollection(char *action,char *actionAttr);
 
 int isValidAddressTypeForAction(int sourcingType, int* validBLA);
 
-void resetIc();
 
 void printCodeCollection();
+
 void addDataWordToCollection(int addressingType, char* value);
 int addToCollection(WordDef * wordDef, int wordType);
 int addActionWord(int actionIndex, int numOfOperands,int srcAddressingType,int destAddressingType);
@@ -31,3 +31,6 @@ WordDef* createDirectWord(char* value);
 WordDef* createDynamicWord(char* value);
 
 unsigned int getWordNumberByRefrenceID(int refrenceID);
+
+void resetIc();
+void cleanCodeCollection();

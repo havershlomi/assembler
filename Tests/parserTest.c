@@ -6,8 +6,6 @@
 #include "../codeCollection.h"
 #include "../symbolsTable.h"
 #include "../fileHandler.h"
-
-
  
 int main(int argc, char* argv[])
 {
