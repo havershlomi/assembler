@@ -79,6 +79,7 @@ void cleanAllCollections()
     disposeSymbolsTable();
     clearData();
     cleanCodeCollection();
+    resetIc();
 }
 
 void printObjFileHeader()
@@ -93,7 +94,7 @@ void printObjFileHeader()
 
     icNumber = getSpecialBase8String(icCollectionSize);
     dcNumber = getSpecialBase8String(dcCollectionSize);
-    
+
     objWriteToFile("%s  %s\n", icNumber, dcNumber);
 
     free(icNumber);
