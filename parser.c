@@ -75,7 +75,7 @@ void firstIteration(FILE* input)
                 {
                     dcPointer =  addStringInstructionToDC(dataStr);
                     if(dcPointer == INVALID)
-                        printf("at row: %s",str);
+                        printErr("at row: %s",str);
                     isExternal = false;
                     commandType = instructionCommand;
                 }
@@ -83,7 +83,7 @@ void firstIteration(FILE* input)
                 {
                     dcPointer = addDataInstructionToDC(dataStr);
                     if(dcPointer == INVALID)
-                        printf("at row: %s",str);
+                        printErr("at row: %s",str);
                     isExternal = false;
                     commandType = instructionCommand;
                 } 
@@ -106,10 +106,7 @@ void firstIteration(FILE* input)
                 {
                     /* add label to the symbol table */
                     symbol = createSymbol(labelPtr, dcPointer, commandType, isExternal);
-                    if(symbol == NULL || tryAddSymbol(symbol) == false)
-                    {
-                        printf("there is a problem adding %s to the symbol table\n",symbol -> name);
-                    }
+                    tryAddSymbol(symbol);
                 }
             } 
             else if((hasLabel == true && sscanf(str,"%*[^ \r\t:]%*[:] %[^ \r\t\n:] %[^\n] ",action, actionAttr) >= 1)
@@ -122,15 +119,13 @@ void firstIteration(FILE* input)
                 {
                     /*  add the action to the symbol table */
                     symbol = createSymbol(label, icPointer, actionCommand, isExternal);
-                    if(symbol == NULL || tryAddSymbol(symbol) == false)
-                    {
-                        printf("there is a problem adding %s to the symbol table\n", symbol -> name);
-                    }                
+                    tryAddSymbol(symbol);                                    
                 }
             } 
-            else if(sscanf(str," %[^ \t\r\n] ",dataStr) == 1){
+            else if(sscanf(str," %[^ \t\r\n] ",dataStr) == 1)
+            {
                 /*if not empty line */
-                printErr("Invalid command \n");
+                printErr("Invalid command '%s'\n",str);
             }
         }
 	}
@@ -207,11 +202,6 @@ void secondIteration(FILE* input){
             {    
                 /*handle action*/
                 addActionToCodeCollection(action,actionAttr);
-            } 
-            else if(sscanf(str," %[^ \t\r\n] ",dataStr) == 1)
-            {
-                /*if not empty line */
-                printErr("Invalid command '%s'\n",str);
             }
         }
 	}

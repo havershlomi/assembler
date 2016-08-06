@@ -19,6 +19,3 @@ Symbol* createSymbol(char *label, int refrence, int commandType, int isExternal)
 
 /* after  the first iteration update the ic counter of all the data */
 void updateSymbolTableRefrences(int icPointer);
-
-/* print the table  */
-void printTable();

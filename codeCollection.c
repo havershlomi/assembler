@@ -534,16 +534,11 @@ void printCodeCollection(){
         word = &codeCollection[i];
         if(word != NULL && word -> word != NULL){
             if(word -> wordType == commandType){
-                printf("%d|%d|%d|%d|%d|%d\n",word -> word -> command.notUsed,word -> word -> command.group,word -> word -> command.opCode,
-                word -> word -> command.src,word -> word -> command.dest,word -> word -> command.ERA);
                 wordAsInt = convertCommandWordToInt(word -> word);
             }  else if(word -> wordType == registerValueType){
-                printf(" %d | %d | %d | %d \n",word -> word -> registerValue.notUsed, word -> word -> registerValue.src,
-                word -> word -> registerValue.dest,word -> word -> registerValue.ERA);
                 wordAsInt = convertRegisterValueWordToInt(word -> word);
                 
             }  else if(word -> wordType == regularValueType){
-                printf(" %d | %d \n",word -> word -> regularValue.value, word -> word -> regularValue.ERA);
                 wordAsInt = convertRegularValueWordToInt(word -> word);
             }
             base8  = convertDecimalNumberToBase8Word(wordAsInt);

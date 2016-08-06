@@ -71,7 +71,7 @@ void printDataCollection(int icRefrence)
         base8 = convertDecimalNumberToBase8Word(dataCollection[i]);
         dataOutput = getStringFromBase8Word(base8);
         /* print to the ob file*/
-        printf("%d  %d\n",lineRefrence,dataCollection[i]);
+        
         objWriteToFile("%s  %s\n", lineNumber, dataOutput);
 
         free(lineNumber);

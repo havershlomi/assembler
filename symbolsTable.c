@@ -146,19 +146,3 @@ void updateSymbolTableRefrences(int icPointer)
         }
     }
 }
-
-void printTable(){
-    SymbolNode *symbolPtr;
-    
-    if(symbolTable != NULL)
-    {
-        /*check if symbol is not in the table already*/
-        symbolPtr = symbolTable;
-        while(symbolPtr != NULL)
-        {
-            printf("%s|%d|%d|%d|%d\n",symbolPtr -> value.name,symbolPtr -> value.icRefrence,symbolPtr -> value.isExternal,
-            symbolPtr -> value.commandType,symbolPtr -> value.dcRefrence);
-            symbolPtr = symbolPtr -> next;
-        }
-    }
-}

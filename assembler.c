@@ -48,7 +48,6 @@ int main(int argc, char* argv[])
                     /* print the output to the .ob file */
                     printCodeCollection();
                     printDataCollection(icPointer);
-                    printTable();
                 } 
                 else 
                 {
