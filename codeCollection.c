@@ -529,7 +529,7 @@ void printCodeCollection(){
     int i = 0, wordAsInt = 0;
     char *output = "", *addressOutput = "";
     
-    for(i = 0; i < ic; i++)
+    for(i = 0; i <= ic; i++)
     {
         word = &codeCollection[i];
         if(word != NULL && word -> word != NULL){
@@ -550,7 +550,7 @@ void printCodeCollection(){
             output = getStringFromBase8Word(base8);
             addressOutput = getSpecialBase8String(i+IC_START_POSITION);
 
-            objWriteToFile("%s  %s\n",addressOutput,output);
+            objWriteToFile("%s  %s\n",addressOutput, output);
 
             free(base8);
             free(output);
