@@ -39,6 +39,8 @@ void firstIteration(FILE* input)
 	char str[LINE_LENGTH] = "", dataStr[LINE_LENGTH] = "";
     Symbol *symbol;
     
+    /* clean this member before the beginning of the iteration */
+    cleanLastICPointer();
     /* read each row */
     while(fgets(str,LINE_LENGTH,input) != NULL)
     {
@@ -141,10 +143,12 @@ void secondIteration(FILE* input){
     char labelDelimeter;
 	char str[LINE_LENGTH] = "", dataStr[LINE_LENGTH] = "",*lineNumber;
 
+    saveLastICPointer();
     /* start counting commands again */
     resetIc();
     /* loop through each line again */
-    while(fgets(str,LINE_LENGTH,input) != NULL){
+    while(fgets(str,LINE_LENGTH,input) != NULL)
+    {
         hasLabel = false;
         actionAttr[0] = '\0';
 

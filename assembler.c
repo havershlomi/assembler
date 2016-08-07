@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 
                 /* rewind to the begining of the file */
                 rewind(inputP);
-
+                
                 /* perfoem the second iteration */
                 secondIteration(inputP);
 
@@ -78,6 +78,7 @@ void cleanAllCollections()
     disposeSymbolsTable();
     clearData();
     cleanCodeCollection();
+    
     resetIc();
 }
 

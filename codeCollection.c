@@ -7,8 +7,10 @@
 extern Action ValidActions[];
 /* ic counter */
 static int ic = 0;
+/* this member will save the last value after the first iteration */
+static int firstIterationLastIC = 0;
 /* code collection */
-static Word codeCollection[1000];
+static Word codeCollection[COLLECTION_SIZE];
 /* an empty word to reset the array with */
 static const Word EmptyWord;
 
@@ -288,6 +290,7 @@ WordDef* createDynamicWord(char* value)
                     /* if command get the command ic position */
                     data = getCommandICPositionByRefrenceID(refrence);
                 }
+                
                 /* get the new value for the specified range */                
                 word -> regularValue.value = cutByBits(data, fromBit, toBit);                
                 word -> regularValue.ERA = absolute;
@@ -400,7 +403,9 @@ WordDef* createRegisterWord(int srcAddressType, char* srcWord, int destAdressTyp
     {
         word -> registerValue.notUsed = 0;
         word -> registerValue.ERA = absolute;
-        
+        word -> registerValue.dest = 0;
+        word -> registerValue.src = 0;
+
         if(destAdressType == directRegister && sscanf(destWord,"r%d",&destNumber) == 1)
         {
             word -> registerValue.dest = destNumber;
@@ -522,6 +527,15 @@ void resetIc()
     ic = 0;
 }
 
+void saveLastICPointer()
+{
+    firstIterationLastIC = ic;
+}
+
+void cleanLastICPointer()
+{
+    firstIterationLastIC = 0;
+}
 
 void printCodeCollection(){
     Word *word;
@@ -529,21 +543,27 @@ void printCodeCollection(){
     int i = 0, wordAsInt = 0;
     char *output = "", *addressOutput = "";
     
-    for(i = 0; i <= ic; i++)
+    for(i = 0; i < firstIterationLastIC; i++)
     {
         word = &codeCollection[i];
-        if(word != NULL && word -> word != NULL){
+        if(word != NULL && word -> word != NULL)
+        {
             if(word -> wordType == commandType)
             {
+            /*    objWriteToFile("%d|%d|%d|%d|%d|%d\n",word -> word -> command.notUsed,word -> word -> command.group,word -> word -> command.opCode,
+                 word -> word -> command.src,word -> word -> command.dest,word -> word -> command.ERA);*/
                 wordAsInt = convertCommandWordToInt(word -> word);
             }
             else if(word -> wordType == registerValueType)
             {
-                wordAsInt = convertRegisterValueWordToInt(word -> word);    
+                wordAsInt = convertRegisterValueWordToInt(word -> word);
+                /*objWriteToFile(" %d | %d | %d | %d \n",word -> word -> registerValue.notUsed, word -> word -> registerValue.src,
+                 word -> word -> registerValue.dest,word -> word -> registerValue.ERA);*/    
             } 
             else if(word -> wordType == regularValueType)
             {
                 wordAsInt = convertRegularValueWordToInt(word -> word);
+                 /*objWriteToFile(" %d | %d \n",word -> word -> regularValue.value, word -> word -> regularValue.ERA);*/
             }
 
             base8  = convertDecimalNumberToBase8Word(wordAsInt);
@@ -561,8 +581,8 @@ void printCodeCollection(){
 
 void cleanCodeCollection()
 {
-     int i = 0;
-    for(i = 0;i < ic; i++)
+    int i = 0;
+    for(i = 0;i < COLLECTION_SIZE; i++)
     {
         codeCollection[i] = EmptyWord;
     }    

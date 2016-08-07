@@ -77,3 +77,9 @@ void cleanCodeCollection();
 
 /* get the ic collection size */
 int getICCollectionSize();
+
+/* saves the ic position in the first iteration member */
+void saveLastICPointer();
+
+/* clean the ic position of the first iteration member */
+void cleanLastICPointer();

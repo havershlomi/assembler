@@ -9,11 +9,4 @@ datlab: mov r1,datlabe
 .entry ABD
 .entry datlab
 prn datlabe[5-12]
-
 mov AR,r2
-.extern r43
-
-prn r4
-
-r43j: .data 43,5,  4, 4,6   ,34
-

@@ -10,6 +10,7 @@
 #define LINE_LENGTH 80
 #define WORD_SIZE 15
 #define OCTAL_WORD_SIZE 15
+#define COLLECTION_SIZE 1000
 
 /*enums*/
 
